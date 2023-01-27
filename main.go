@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/devNica/mochileros/configurations"
+	"github.com/devNica/mochileros/exceptions"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -23,8 +24,6 @@ func main() {
 
 	// start app
 	err := app.Listen(config.Get("SERVER_PORT"))
-	if err != nil {
-		panic(err)
-	}
+	exceptions.PanicLogging(err)
 
 }
