@@ -12,6 +12,7 @@ func main() {
 
 	//setup configurations
 	config := configurations.New()
+	configurations.DatabaseConnect(config)
 
 	//setup fiber
 	app := fiber.New(configurations.NewFiber())

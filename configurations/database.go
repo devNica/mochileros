@@ -3,7 +3,8 @@ package configurations
 import (
 	"fmt"
 
-	"gorm.io/driver/mysql"
+	"github.com/devNica/mochileros/entities"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
@@ -14,10 +15,23 @@ func DatabaseConnect(config Config) *gorm.DB {
 	host := config.Get("DATABASE_HOST")
 	port := config.Get("DATABASE_PORT")
 	dbName := config.Get("DATABASE_NAME")
+	sslMode := config.Get("DATABASE_SSL_MODE")
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", username, password, host, port, dbName)
+	// for mysql connection
+	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", username, password, host, port, dbName)
 
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+	// db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+	// 	NamingStrategy: schema.NamingStrategy{
+	// 		SingularTable: true,
+	// 	},
+	// })
+
+	// for postgres connection
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", host, port, username, password, dbName, sslMode)
+
+	fmt.Println("DSN", dsn)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
@@ -28,6 +42,12 @@ func DatabaseConnect(config Config) *gorm.DB {
 	}
 
 	//AutoMigrate
+	err = db.AutoMigrate(&entities.Country{})
+	err = db.AutoMigrate(&entities.Profile{})
+	err = db.AutoMigrate(&entities.UserAccount{})
+	err = db.AutoMigrate(&entities.UserInfo{})
+	err = db.AutoMigrate(&entities.Hotel{})
+	err = db.AutoMigrate(&entities.UserHasProfile{})
 
 	return db
 
