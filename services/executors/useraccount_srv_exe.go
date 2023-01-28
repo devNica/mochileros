@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/devNica/mochileros/commons"
 	"github.com/devNica/mochileros/entities"
 	"github.com/devNica/mochileros/exceptions"
 	"github.com/devNica/mochileros/models"
@@ -20,6 +21,8 @@ func NewUserAccountSrvExecutor(repo *repositories.UserAccountRepo) services.User
 }
 
 func (srv *userAccountServiceExecutor) UserAccountRegister(ctx context.Context, requestModel models.UserAccounRequestModel) {
+	commons.ValidateModel(requestModel)
+
 	account := entities.UserAccount{
 		Email:     requestModel.Email,
 		Password:  requestModel.Password,
