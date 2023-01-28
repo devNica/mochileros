@@ -27,7 +27,7 @@ func (repo *userAccountExecutor) UserInsert(ctx context.Context, userAccount ent
 
 		profile := entities.UserHasProfile{
 			UserId:    userAccount.Id,
-			ProfileId: 4,
+			ProfileId: 2,
 		}
 
 		if err := tx.Create(&profile).Error; err != nil {
