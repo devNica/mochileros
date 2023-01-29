@@ -16,12 +16,13 @@ func main() {
 	//setup configurations
 	config := configurations.New()
 	conn := configurations.DatabaseConnect(config)
+	argon := configurations.NewArgonConfg()
 
 	// repositories
 	userAccountRepository := repository.NewUserAccountExecutor(conn)
 
 	//services
-	UserAccountService := service.NewUserAccountSrvExecutor(&userAccountRepository)
+	UserAccountService := service.NewUserAccountSrvExecutor(&userAccountRepository, &argon)
 
 	//controllers
 	userAccountController := controllers.NewUserAccountController(&UserAccountService, config)

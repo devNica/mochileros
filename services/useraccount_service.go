@@ -8,4 +8,5 @@ import (
 
 type UserAccountService interface {
 	UserAccountRegister(ctx context.Context, model models.UserAccounRequestModel)
+	GetUserByEmail(ctx context.Context, email string) models.UserResponseModel
 }

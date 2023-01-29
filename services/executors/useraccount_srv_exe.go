@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/devNica/mochileros/commons"
+	argon2 "github.com/devNica/mochileros/commons/argon"
+	"github.com/devNica/mochileros/configurations"
 	"github.com/devNica/mochileros/entities"
 	"github.com/devNica/mochileros/exceptions"
 	"github.com/devNica/mochileros/models"
@@ -14,22 +16,39 @@ import (
 
 type userAccountServiceExecutor struct {
 	repositories.UserAccountRepo
+	configurations.Argon2Config
 }
 
-func NewUserAccountSrvExecutor(repo *repositories.UserAccountRepo) services.UserAccountService {
-	return &userAccountServiceExecutor{UserAccountRepo: *repo}
+func NewUserAccountSrvExecutor(repo *repositories.UserAccountRepo, argon *configurations.Argon2Config) services.UserAccountService {
+	return &userAccountServiceExecutor{UserAccountRepo: *repo, Argon2Config: *argon}
 }
 
 func (srv *userAccountServiceExecutor) UserAccountRegister(ctx context.Context, requestModel models.UserAccounRequestModel) {
 	commons.ValidateModel(requestModel)
-
+	hash := argon2.GeneratePassworHash(requestModel.Password, &srv.Argon2Config)
 	account := entities.UserAccount{
 		Email:     requestModel.Email,
-		Password:  requestModel.Password,
+		Password:  hash,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
 
 	err := srv.UserAccountRepo.UserInsert(ctx, account)
 	exceptions.PanicLogging(err)
+}
+
+func (srv *userAccountServiceExecutor) GetUserByEmail(ctx context.Context, email string) models.UserResponseModel {
+	userAccount, err := srv.UserAccountRepo.FetchUserByEmail(ctx, email)
+
+	if err != nil {
+		panic(exceptions.NotFoundError{
+			Message: err.Error(),
+		})
+	}
+
+	return models.UserResponseModel{
+		Email:     userAccount.Email,
+		IsActive:  userAccount.IsActive,
+		CreatedAt: userAccount.CreatedAt,
+	}
 }

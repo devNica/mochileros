@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"fmt"
+
 	"github.com/devNica/mochileros/configurations"
 	"github.com/devNica/mochileros/exceptions"
 	"github.com/devNica/mochileros/models"
@@ -19,6 +21,7 @@ func NewUserAccountController(service *services.UserAccountService, config confi
 
 func (controller userAccountController) Route(app *fiber.App) {
 	app.Post("/mochileros/v1/account/customer", controller.Register)
+	app.Post("/mochileros/v1/account/user", controller.GetUserByEmail)
 }
 
 func (controller userAccountController) Register(c *fiber.Ctx) error {
@@ -32,4 +35,27 @@ func (controller userAccountController) Register(c *fiber.Ctx) error {
 		Message: "User has been registered successfull",
 		Data:    "",
 	})
+}
+
+func (controller userAccountController) GetUserByEmail(c *fiber.Ctx) error {
+
+	type fetchUser struct {
+		Email string `json:"email" validate:"required"`
+	}
+
+	request := fetchUser{}
+
+	fmt.Println("request", c.BodyParser(&request))
+
+	err := c.BodyParser(&request)
+	exceptions.PanicLogging(err)
+
+	response := controller.UserAccountService.GetUserByEmail(c.Context(), request.Email)
+
+	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
+		Code:    201,
+		Message: "User has been registered successfull",
+		Data:    response,
+	})
+
 }

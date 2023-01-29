@@ -2,6 +2,7 @@ package executors
 
 import (
 	"context"
+	"errors"
 
 	"github.com/devNica/mochileros/entities"
 	"github.com/devNica/mochileros/repositories"
@@ -43,4 +44,16 @@ func (repo *userAccountExecutor) UserInsert(ctx context.Context, userAccount ent
 	}
 
 	return nil
+}
+
+func (repo *userAccountExecutor) FetchUserByEmail(ctx context.Context, email string) (entities.UserAccount, error) {
+
+	var foundUser entities.UserAccount
+
+	result := repo.DB.WithContext(ctx).Where("email = ?", email).First(&foundUser)
+	if result.RowsAffected == 0 {
+		return entities.UserAccount{}, errors.New("user Not Found")
+	}
+
+	return foundUser, nil
 }
