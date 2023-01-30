@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/devNica/mochileros/entities"
+	"github.com/devNica/mochileros/exceptions"
 	"github.com/devNica/mochileros/repositories"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -43,6 +44,13 @@ func (repo *userAccountExecutor) UserInsert(ctx context.Context, userAccount ent
 		return err
 	}
 
+	return nil
+}
+
+func (repo *userAccountExecutor) InsertKYC(ctx context.Context, kyc entities.UserInfo) error {
+	kyc.Id = uuid.New()
+	err := repo.DB.WithContext(ctx).Create(&kyc).Error
+	exceptions.PanicLogging(err)
 	return nil
 }
 

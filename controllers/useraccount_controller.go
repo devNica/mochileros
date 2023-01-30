@@ -22,6 +22,7 @@ func NewUserAccountController(service *services.UserAccountService, config confi
 func (controller userAccountController) Route(app *fiber.App) {
 	app.Post("/mochileros/v1/account/customer", controller.Register)
 	app.Post("/mochileros/v1/account/user", controller.GetUserByEmail)
+	app.Post("/mochileros/v1/account/user/:userId/kyc", controller.RegisterKYC)
 }
 
 func (controller userAccountController) Register(c *fiber.Ctx) error {
@@ -58,4 +59,20 @@ func (controller userAccountController) GetUserByEmail(c *fiber.Ctx) error {
 		Data:    response,
 	})
 
+}
+
+func (controller userAccountController) RegisterKYC(c *fiber.Ctx) error {
+
+	var request models.KYCRequestModel
+	request.UserId = c.Params("userID")
+	err := c.BodyParser(&request)
+	exceptions.PanicLogging(err)
+
+	controller.UserAccountService.RegisterKYC(c.Context(), request)
+
+	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
+		Code:    201,
+		Message: "KYC registered successfully",
+		Data:    "",
+	})
 }

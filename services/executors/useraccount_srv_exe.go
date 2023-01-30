@@ -12,6 +12,7 @@ import (
 	"github.com/devNica/mochileros/models"
 	"github.com/devNica/mochileros/repositories"
 	"github.com/devNica/mochileros/services"
+	"github.com/google/uuid"
 )
 
 type userAccountServiceExecutor struct {
@@ -35,6 +36,20 @@ func (srv *userAccountServiceExecutor) UserAccountRegister(ctx context.Context, 
 
 	err := srv.UserAccountRepo.UserInsert(ctx, account)
 	exceptions.PanicLogging(err)
+}
+
+func (srv *userAccountServiceExecutor) RegisterKYC(ctx context.Context, kycModel models.KYCRequestModel) {
+
+	userId, err := uuid.Parse(kycModel.UserId)
+	exceptions.PanicLogging(err)
+
+	kycEntity := entities.UserInfo{
+		FirstName: kycModel.FirstName,
+		LastName:  kycModel.LastName,
+		UserId:    userId,
+	}
+
+	srv.UserAccountRepo.InsertKYC(ctx, kycEntity)
 }
 
 func (srv *userAccountServiceExecutor) GetUserByEmail(ctx context.Context, email string) models.UserResponseModel {
