@@ -95,3 +95,22 @@ func (repo *userAccountExecutor) FetchCompleteUserInfo(ctx context.Context, user
 	return account, nil
 
 }
+
+func (repo *userAccountExecutor) UpdateUserAccountStatus(ctx context.Context, userId string) (entities.UserAccount, error) {
+
+	var User entities.UserAccount
+
+	q1 := repo.DB.WithContext(ctx).Where("id = ?", userId).First(&User)
+
+	if q1.RowsAffected == 0 {
+		return entities.UserAccount{}, errors.New("User account not found")
+	}
+
+	q2 := repo.DB.Model(User).Where("id = ?", userId).Update("is_active", !User.IsActive)
+
+	if q2.RowsAffected == 0 {
+		return entities.UserAccount{}, errors.New("failed to update account")
+	}
+
+	return User, nil
+}

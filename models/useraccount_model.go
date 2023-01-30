@@ -11,12 +11,6 @@ type UserAccounRequestModel struct {
 	Password string `json:"password" validate:"required"`
 }
 
-type UserResponseModel struct {
-	Email     string    `json:"email"`
-	IsActive  bool      `json:"isActive"`
-	CreatedAt time.Time `json:"createdAt"`
-}
-
 type KYCRequestModel struct {
 	UserId    string `json:"userId" validate:"required"`
 	FirstName string `json:"firstName" validate:"required"`
@@ -32,6 +26,12 @@ type CompleteUserRequestModel struct {
 	UserId    uuid.UUID
 }
 
+type UserResponseModel struct {
+	Email     string    `json:"email"`
+	IsActive  bool      `json:"isActive"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
 type KYCResponseModel struct {
 	Id       uuid.UUID
 	Email    string
@@ -40,4 +40,9 @@ type KYCResponseModel struct {
 		FirstName string
 		LastName  string
 	}
+}
+
+type UpdateUserAccountStatusResModel struct {
+	UserId   uuid.UUID
+	IsActive bool
 }

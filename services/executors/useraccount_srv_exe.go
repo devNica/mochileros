@@ -89,3 +89,12 @@ func (srv *userAccountServiceExecutor) GetCompleteUserInfo(ctx context.Context, 
 		},
 	}
 }
+
+func (srv *userAccountServiceExecutor) ChangeAccountStatus(ctx context.Context, userId string) models.UpdateUserAccountStatusResModel {
+	response, err := srv.UserAccountRepo.UpdateUserAccountStatus(ctx, userId)
+	exceptions.PanicLogging(err)
+	return models.UpdateUserAccountStatusResModel{
+		UserId:   response.Id,
+		IsActive: response.IsActive,
+	}
+}
