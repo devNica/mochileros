@@ -3,9 +3,11 @@ package executors
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/devNica/mochileros/entities"
 	"github.com/devNica/mochileros/exceptions"
+	"github.com/devNica/mochileros/models"
 	"github.com/devNica/mochileros/repositories"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -63,5 +65,33 @@ func (repo *userAccountExecutor) FetchUserByEmail(ctx context.Context, email str
 		return entities.UserAccount{}, errors.New("user Not Found")
 	}
 
+	fmt.Println("user account", foundUser)
+
 	return foundUser, nil
+}
+
+func (repo *userAccountExecutor) FetchCompleteUserInfo(ctx context.Context, userId string) (entities.UserAccount, error) {
+
+	var queryModel models.CompleteUserRequestModel
+
+	result := repo.DB.Raw("Select ua.id, ua.email, ui.first_name, ui.id as user_id, ui.last_name, ua.is_active from user_account ua inner join user_info ui on ui.user_id = ua.id").Scan(&queryModel)
+
+	if result.RowsAffected == 0 {
+		return entities.UserAccount{}, errors.New("user Not Found")
+	}
+
+	account := entities.UserAccount{
+		Id:       queryModel.Id,
+		Email:    queryModel.Email,
+		IsActive: queryModel.IsActive,
+		UserKYC: entities.UserInfo{
+			Id:        queryModel.UserId,
+			FirstName: queryModel.FirstName,
+			LastName:  queryModel.LastName,
+			UserId:    queryModel.Id,
+		},
+	}
+
+	return account, nil
+
 }

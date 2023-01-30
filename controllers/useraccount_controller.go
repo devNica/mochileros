@@ -23,6 +23,7 @@ func (controller userAccountController) Route(app *fiber.App) {
 	app.Post("/mochileros/v1/account/customer", controller.Register)
 	app.Post("/mochileros/v1/account/user", controller.GetUserByEmail)
 	app.Post("/mochileros/v1/account/user/:userId/kyc", controller.RegisterKYC)
+	app.Get("/mochileros/v1/account/user/:userId", controller.GetCompleteUserInfo)
 }
 
 func (controller userAccountController) Register(c *fiber.Ctx) error {
@@ -74,5 +75,18 @@ func (controller userAccountController) RegisterKYC(c *fiber.Ctx) error {
 		Code:    201,
 		Message: "KYC registered successfully",
 		Data:    "",
+	})
+}
+
+func (controller userAccountController) GetCompleteUserInfo(c *fiber.Ctx) error {
+
+	userId := c.Params("userID")
+
+	response := controller.UserAccountService.GetCompleteUserInfo(c.Context(), userId)
+
+	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
+		Code:    200,
+		Message: "Success",
+		Data:    response,
 	})
 }
