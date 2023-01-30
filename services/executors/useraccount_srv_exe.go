@@ -69,7 +69,7 @@ func (srv *userAccountServiceExecutor) GetUserByEmail(ctx context.Context, email
 }
 
 func (srv *userAccountServiceExecutor) GetCompleteUserInfo(ctx context.Context, userId string) models.KYCResponseModel {
-	response, err := srv.UserAccountRepo.FetchCompleteUserInfo(ctx, userId)
+	profile, user, err := srv.UserAccountRepo.FetchCompleteUserInfo(ctx, userId)
 	if err != nil {
 		panic(exceptions.NotFoundError{
 			Message: err.Error(),
@@ -77,16 +77,17 @@ func (srv *userAccountServiceExecutor) GetCompleteUserInfo(ctx context.Context, 
 	}
 
 	return models.KYCResponseModel{
-		Id:       response.Id,
-		Email:    response.Email,
-		IsActive: response.IsActive,
+		Id:       user.Id,
+		Email:    user.Email,
+		IsActive: user.IsActive,
 		KYC: struct {
 			FirstName string
 			LastName  string
 		}{
-			FirstName: response.UserKYC.FirstName,
-			LastName:  response.UserKYC.LastName,
+			FirstName: user.UserKYC.FirstName,
+			LastName:  user.UserKYC.LastName,
 		},
+		Profile: profile.Profile,
 	}
 }
 

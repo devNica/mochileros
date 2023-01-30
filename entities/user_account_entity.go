@@ -24,3 +24,7 @@ type UserInfo struct {
 	LastName  string    `gorm:"column:last_name;type:varchar(100);not null"`
 	UserId    uuid.UUID `gorm:"column:user_id;primaryKey"`
 }
+
+type TypeProfile struct {
+	Profile string
+}

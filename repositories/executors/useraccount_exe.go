@@ -70,14 +70,28 @@ func (repo *userAccountExecutor) FetchUserByEmail(ctx context.Context, email str
 	return foundUser, nil
 }
 
-func (repo *userAccountExecutor) FetchCompleteUserInfo(ctx context.Context, userId string) (entities.UserAccount, error) {
+func (repo *userAccountExecutor) FetchCompleteUserInfo(ctx context.Context, userId string) (entities.TypeProfile, entities.UserAccount, error) {
 
 	var queryModel models.CompleteUserRequestModel
 
-	result := repo.DB.Raw("Select ua.id, ua.email, ui.first_name, ui.id as user_id, ui.last_name, ua.is_active from user_account ua inner join user_info ui on ui.user_id = ua.id").Scan(&queryModel)
+	result := repo.DB.Raw(`
+		Select 
+			ua.id, 
+			ua.email, 
+			ui.first_name, 
+			ui.id as user_id, 
+			ui.last_name, 
+			ua.is_active,
+			p.profile
+
+		from user_account ua inner 
+		join user_info ui on ui.user_id = ua.id
+		join user_has_profile uhp on uhp.user_id = ua.id
+		join profile p on p.id = uhp.profile_id
+		`).Scan(&queryModel)
 
 	if result.RowsAffected == 0 {
-		return entities.UserAccount{}, errors.New("user Not Found")
+		return entities.TypeProfile{}, entities.UserAccount{}, errors.New("user Not Found")
 	}
 
 	account := entities.UserAccount{
@@ -92,7 +106,11 @@ func (repo *userAccountExecutor) FetchCompleteUserInfo(ctx context.Context, user
 		},
 	}
 
-	return account, nil
+	profile := entities.TypeProfile{
+		Profile: queryModel.Profile,
+	}
+
+	return profile, account, nil
 
 }
 

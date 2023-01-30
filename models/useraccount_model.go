@@ -22,6 +22,7 @@ type CompleteUserRequestModel struct {
 	Email     string
 	FirstName string
 	LastName  string
+	Profile   string
 	IsActive  bool
 	UserId    uuid.UUID
 }
@@ -40,6 +41,7 @@ type KYCResponseModel struct {
 		FirstName string
 		LastName  string
 	}
+	Profile string
 }
 
 type UpdateUserAccountStatusResModel struct {
