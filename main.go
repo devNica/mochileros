@@ -21,14 +21,17 @@ func main() {
 	// repositories
 	userAccountRepository := repository.NewUserAccountExecutor(conn)
 	migrationRepository := repository.NewMigrationExecutor(conn)
+	countryRepository := repository.NewCountryRepoExecutor(conn)
 
 	//services
 	UserAccountService := service.NewUserAccountSrvExecutor(&userAccountRepository, &argon)
 	MigrationService := service.NewMigrationServiceExecutor(&migrationRepository)
+	ResourcesService := service.NewResourcesServiceExecutor(&countryRepository)
 
 	//controllers
 	userAccountController := controllers.NewUserAccountController(&UserAccountService, config)
 	migrationController := controllers.NewMigrationController(&MigrationService, config)
+	propsController := controllers.NewPropsController(&ResourcesService, config)
 
 	//setup fiber
 	app := fiber.New(configurations.NewFiber())
@@ -42,6 +45,7 @@ func main() {
 	// routing
 	userAccountController.Route(app)
 	migrationController.Route(app)
+	propsController.Route(app)
 
 	// start app
 	err := app.Listen(config.Get("SERVER_PORT"))

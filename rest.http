@@ -43,3 +43,10 @@ GET    http://localhost:5400/mochileros/v1/migration/countries HTTP/1.1
 Content-Type: application/json
 
 {}
+
+
+######
+GET    http://localhost:5400/mochileros/v1/props/country HTTP/1.1
+Content-Type: application/json
+
+{}
