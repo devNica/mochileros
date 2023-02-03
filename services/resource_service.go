@@ -8,4 +8,5 @@ import (
 
 type ResourcesService interface {
 	GetAll(ctx context.Context) []models.Country
+	GetCountryByName(ctx context.Context, countryName string) models.Country
 }

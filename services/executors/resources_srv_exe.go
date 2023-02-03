@@ -46,3 +46,27 @@ func (repo *resourcesServiceExecutor) GetAll(ctx context.Context) (responses []m
 	return countries
 
 }
+
+func (repo *resourcesServiceExecutor) GetCountryByName(ctx context.Context, countryName string) (responses models.Country) {
+
+	country, err := repo.CountryRepo.FetchCountryByName(ctx, countryName)
+	exceptions.PanicLogging(err)
+
+	return models.Country{
+		Id:          country.Id,
+		Name:        country.Name,
+		Capital:     country.Capital,
+		Cca3:        country.Cca3,
+		CallingCode: country.CallingCode,
+		TimeZones:   country.TimeZones,
+		States:      country.States,
+		Latitude:    country.Latitude,
+		Longitude:   country.Longitude,
+		FlagPng:     country.FlagPng,
+		FlagSvg:     country.FlagSvg,
+		CurrCode:    country.CurrCode,
+		CurrName:    country.CurrName,
+		CurrSymbol:  country.CurrSymbol,
+	}
+
+}

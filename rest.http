@@ -50,3 +50,10 @@ GET    http://localhost:5400/mochileros/v1/props/country HTTP/1.1
 Content-Type: application/json
 
 {}
+
+######
+
+GET    http://localhost:5400/mochileros/v1/props/country/Nicaragua HTTP/1.1
+Content-Type: application/json
+
+{}

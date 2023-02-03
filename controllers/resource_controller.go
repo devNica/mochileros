@@ -18,11 +18,22 @@ func NewPropsController(srv *services.ResourcesService, config configurations.Co
 
 func (controller propsController) Route(app *fiber.App) {
 	app.Get("/mochileros/v1/props/country", controller.GetAllCountries)
+	app.Get("/mochileros/v1/props/country/:name/", controller.GetCountryByName)
 }
 
 func (controller propsController) GetAllCountries(c *fiber.Ctx) error {
 
 	response := controller.ResourcesService.GetAll(c.Context())
+	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
+		Code:    201,
+		Message: "Sucessfull Requets",
+		Data:    response,
+	})
+}
+
+func (controller propsController) GetCountryByName(c *fiber.Ctx) error {
+
+	response := controller.ResourcesService.GetCountryByName(c.Context(), c.Params("name"))
 	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
 		Code:    201,
 		Message: "Sucessfull Requets",

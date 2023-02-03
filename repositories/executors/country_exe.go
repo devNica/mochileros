@@ -29,3 +29,16 @@ func (repo *countryRepoExecutor) FetchAll(ctx context.Context) ([]entities.Count
 
 	return countries, nil
 }
+
+func (repo *countryRepoExecutor) FetchCountryByName(ctx context.Context, countryName string) (entities.Country, error) {
+
+	var country entities.Country
+
+	result := repo.DB.Where("name = ?", countryName).First(&country)
+
+	if result.RowsAffected == 0 {
+		return entities.Country{}, errors.New("Countries not found")
+	}
+
+	return country, nil
+}
