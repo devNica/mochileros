@@ -28,6 +28,7 @@ type CompleteUserRequestModel struct {
 }
 
 type UserResponseModel struct {
+	Id        uuid.UUID `json:"user_id"`
 	Email     string    `json:"email"`
 	IsActive  bool      `json:"isActive"`
 	CreatedAt time.Time `json:"createdAt"`

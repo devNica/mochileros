@@ -91,7 +91,7 @@ func (repo *userAccountExecutor) FetchCompleteUserInfo(ctx context.Context, user
 		`).Scan(&queryModel)
 
 	if result.RowsAffected == 0 {
-		return entities.TypeProfile{}, entities.UserAccount{}, errors.New("user Not Found")
+		return entities.TypeProfile{}, entities.UserAccount{}, errors.New("Complete User Info Not Found")
 	}
 
 	account := entities.UserAccount{

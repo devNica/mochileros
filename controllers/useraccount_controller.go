@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/devNica/mochileros/configurations"
 	"github.com/devNica/mochileros/exceptions"
@@ -21,9 +21,9 @@ func NewUserAccountController(service *services.UserAccountService, config confi
 
 func (controller userAccountController) Route(app *fiber.App) {
 	app.Post("/mochileros/v1/account/customer", controller.Register)
-	app.Post("/mochileros/v1/account/user", controller.GetUserByEmail)
+	app.Get("/mochileros/v1/account/user/:email", controller.GetUserByEmail)
 	app.Post("/mochileros/v1/account/user/:userId/kyc", controller.RegisterKYC)
-	app.Get("/mochileros/v1/account/user/:userId", controller.GetCompleteUserInfo)
+	app.Get("/mochileros/v1/account/user/:userId/info", controller.GetCompleteUserInfo)
 	app.Put("/mochileros/v1/account/user/:userId/status", controller.ChangeAccountStatus)
 }
 
@@ -42,18 +42,9 @@ func (controller userAccountController) Register(c *fiber.Ctx) error {
 
 func (controller userAccountController) GetUserByEmail(c *fiber.Ctx) error {
 
-	type fetchUser struct {
-		Email string `json:"email" validate:"required"`
-	}
+	log.Println("es que entro aca")
 
-	request := fetchUser{}
-
-	fmt.Println("request", c.BodyParser(&request))
-
-	err := c.BodyParser(&request)
-	exceptions.PanicLogging(err)
-
-	response := controller.UserAccountService.GetUserByEmail(c.Context(), request.Email)
+	response := controller.UserAccountService.GetUserByEmail(c.Context(), c.Params("email"))
 
 	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
 		Code:    201,
@@ -82,6 +73,7 @@ func (controller userAccountController) RegisterKYC(c *fiber.Ctx) error {
 func (controller userAccountController) GetCompleteUserInfo(c *fiber.Ctx) error {
 
 	userId := c.Params("userID")
+	log.Println("userId: ", userId)
 
 	response := controller.UserAccountService.GetCompleteUserInfo(c.Context(), userId)
 

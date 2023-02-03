@@ -62,6 +62,7 @@ func (srv *userAccountServiceExecutor) GetUserByEmail(ctx context.Context, email
 	}
 
 	return models.UserResponseModel{
+		Id:        userAccount.Id,
 		Email:     userAccount.Email,
 		IsActive:  userAccount.IsActive,
 		CreatedAt: userAccount.CreatedAt,
