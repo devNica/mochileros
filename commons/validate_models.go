@@ -13,10 +13,11 @@ func ValidateModel(modelToValidate interface{}) {
 
 	if err != nil {
 		var messages []map[string]interface{}
+
 		for _, err := range err.(validator.ValidationErrors) {
 			messages = append(messages, map[string]interface{}{
 				"field":   err.Field(),
-				"message": "this field is" + err.Tag(),
+				"message": "this field is " + err.Tag(),
 			})
 		}
 

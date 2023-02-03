@@ -20,7 +20,7 @@ POST  http://localhost:5400/mochileros/v1/account/user/d840e3eb-d219-4734-9d9d-b
 Content-Type: application/json
 
 {
-    "FirstName": "Lucas Andres",
+    "FirstName": "Lucas Jose",
     "LastName": "Marsell"
 }
 
@@ -33,6 +33,13 @@ Content-Type: application/json
 
 #### 
 PUT   http://localhost:5400/mochileros/v1/account/user/d840e3eb-d219-4734-9d9d-b589e5f4de0b/status HTTP/1.1
+Content-Type: application/json
+
+{}
+
+
+######
+GET    http://localhost:5400/mochileros/v1/migration/countries HTTP/1.1
 Content-Type: application/json
 
 {}
