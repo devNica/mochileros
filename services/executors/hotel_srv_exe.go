@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/devNica/mochileros/commons"
+	"github.com/devNica/mochileros/dto/request"
 	"github.com/devNica/mochileros/dto/response"
 	"github.com/devNica/mochileros/entities"
 	"github.com/devNica/mochileros/exceptions"
-	"github.com/devNica/mochileros/models"
 	"github.com/devNica/mochileros/repositories"
 	"github.com/devNica/mochileros/services"
 	"github.com/google/uuid"
@@ -22,23 +22,23 @@ func NewHotelServiceExecutor(repo *repositories.HotelRepo) services.HotelService
 	return &hotelServiceExecutor{HotelRepo: *repo}
 }
 
-func (repo *hotelServiceExecutor) RegisterHotel(ctx context.Context, hotelReq models.HotelRequestModel) {
-	commons.ValidateModel(hotelReq)
+func (repo *hotelServiceExecutor) RegisterHotel(ctx context.Context, newHotel request.HotelRequestModel) {
+	commons.ValidateModel(newHotel)
 
-	ownerId, errParse := uuid.Parse(hotelReq.OwnerId)
+	ownerId, errParse := uuid.Parse(newHotel.OwnerId)
 	exceptions.PanicLogging(errParse)
 
 	hotel := entities.Hotel{
 		Id:                 uuid.New(),
-		NameHotel:          hotelReq.NameHotel,
-		Address:            hotelReq.Address,
-		ServicePhoneNumber: hotelReq.ServicePhoneNumber,
-		State:              hotelReq.State,
+		NameHotel:          newHotel.NameHotel,
+		Address:            newHotel.Address,
+		ServicePhoneNumber: newHotel.ServicePhoneNumber,
+		State:              newHotel.State,
 		IsActive:           true,
-		Province:           hotelReq.Province,
+		Province:           newHotel.Province,
 		CreatedAt:          time.Now(),
 		OwnerId:            ownerId,
-		CountryID:          hotelReq.CountryID,
+		CountryID:          newHotel.CountryID,
 	}
 
 	err := repo.HotelRepo.InsertHotel(ctx, hotel)

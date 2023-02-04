@@ -18,14 +18,35 @@ func NewCountryRepoExecutor(DB *gorm.DB) repositories.CountryRepo {
 	return &countryRepoExecutor{DB: DB}
 }
 
-func (repo *countryRepoExecutor) FetchAll(ctx context.Context) ([]entities.Country, error) {
+func (repo *countryRepoExecutor) FetchAll(ctx context.Context) ([]response.CountryResponseModel, error) {
 
-	var countries []entities.Country
+	var listCountries []entities.Country
 
-	result := repo.DB.Find(&countries)
+	result := repo.DB.Limit(20).Find(&listCountries)
 
 	if result.RowsAffected == 0 {
-		return []entities.Country{}, errors.New("Countries not found")
+		return []response.CountryResponseModel{}, errors.New("Countries not found")
+	}
+
+	var countries []response.CountryResponseModel
+	for _, country := range listCountries {
+
+		countries = append(countries, response.CountryResponseModel{
+			Id:          country.Id,
+			Name:        country.Name,
+			Capital:     country.Name,
+			Cca3:        country.Cca3,
+			CallingCode: country.CallingCode,
+			TimeZones:   country.TimeZones,
+			States:      country.States,
+			Latitude:    country.Latitude,
+			Longitude:   country.Longitude,
+			FlagPng:     country.FlagPng,
+			FlagSvg:     country.FlagSvg,
+			CurrCode:    country.CurrCode,
+			CurrName:    country.CurrName,
+			CurrSymbol:  country.CurrSymbol,
+		})
 	}
 
 	return countries, nil

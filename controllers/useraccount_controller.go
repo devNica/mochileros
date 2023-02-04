@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/devNica/mochileros/configurations"
+	"github.com/devNica/mochileros/dto/request"
 	"github.com/devNica/mochileros/exceptions"
 	"github.com/devNica/mochileros/models"
 	"github.com/devNica/mochileros/services"
@@ -28,7 +29,7 @@ func (controller userAccountController) Route(app *fiber.App) {
 }
 
 func (controller userAccountController) Register(c *fiber.Ctx) error {
-	var request models.UserAccounRequestModel
+	var request request.UserAccounRequestModel
 	err := c.BodyParser(&request)
 	exceptions.PanicLogging(err)
 
@@ -56,7 +57,7 @@ func (controller userAccountController) GetUserByEmail(c *fiber.Ctx) error {
 
 func (controller userAccountController) RegisterKYC(c *fiber.Ctx) error {
 
-	var request models.KYCRequestModel
+	var request request.KYCRequestModel
 	request.UserId = c.Params("userID")
 	err := c.BodyParser(&request)
 	exceptions.PanicLogging(err)

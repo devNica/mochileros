@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/devNica/mochileros/configurations"
+	"github.com/devNica/mochileros/dto/request"
 	"github.com/devNica/mochileros/exceptions"
 	"github.com/devNica/mochileros/models"
 	"github.com/devNica/mochileros/services"
@@ -24,7 +25,7 @@ func (controller hotelController) Route(app *fiber.App) {
 
 func (controller hotelController) RegisterHotel(c *fiber.Ctx) error {
 
-	var hotel models.HotelRequestModel
+	var hotel request.HotelRequestModel
 
 	err := c.BodyParser(&hotel)
 	exceptions.PanicLogging(err)

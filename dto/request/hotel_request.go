@@ -1,6 +1,4 @@
-package models
-
-import "github.com/google/uuid"
+package request
 
 type HotelRequestModel struct {
 	NameHotel          string `json:"nameHotel" validate:"required"`
@@ -10,14 +8,4 @@ type HotelRequestModel struct {
 	State              string `json:"state" validate:"required"`
 	Province           string `json:"province" validate:"required"`
 	OwnerId            string `json:"ownerId" validate:"required"`
-}
-
-type HotelResponseModel struct {
-	HotelId            uuid.UUID
-	NameHotel          string
-	Address            string
-	ServicePhoneNumber string
-	Country            string
-	State              string
-	Province           string
 }

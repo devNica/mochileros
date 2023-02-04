@@ -131,20 +131,27 @@ func (repo *userAccountExecutor) FetchCompleteUserInfo(ctx context.Context, user
 
 }
 
-func (repo *userAccountExecutor) UpdateUserAccountStatus(ctx context.Context, userId string) (entities.UserAccount, error) {
+func (repo *userAccountExecutor) UpdateUserAccountStatus(ctx context.Context, userId string) (response.UserResponseModel, error) {
 
-	var User entities.UserAccount
+	var foundUser entities.UserAccount
 
-	q1 := repo.DB.WithContext(ctx).Where("id = ?", userId).First(&User)
+	q1 := repo.DB.WithContext(ctx).Where("id = ?", userId).First(&foundUser)
 
 	if q1.RowsAffected == 0 {
-		return entities.UserAccount{}, errors.New("User account not found")
+		return response.UserResponseModel{}, errors.New("User account not found")
 	}
 
-	q2 := repo.DB.Model(User).Where("id = ?", userId).Update("is_active", !User.IsActive)
+	q2 := repo.DB.Model(foundUser).Where("id = ?", userId).Update("is_active", !foundUser.IsActive)
 
 	if q2.RowsAffected == 0 {
-		return entities.UserAccount{}, errors.New("failed to update account")
+		return response.UserResponseModel{}, errors.New("failed to update account")
+	}
+
+	User := response.UserResponseModel{
+		Id:        foundUser.Id,
+		Email:     foundUser.Email,
+		IsActive:  foundUser.IsActive,
+		CreatedAt: foundUser.CreatedAt,
 	}
 
 	return User, nil

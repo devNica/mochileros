@@ -7,10 +7,10 @@ import (
 	"github.com/devNica/mochileros/commons"
 	argon2 "github.com/devNica/mochileros/commons/argon"
 	"github.com/devNica/mochileros/configurations"
+	"github.com/devNica/mochileros/dto/request"
 	"github.com/devNica/mochileros/dto/response"
 	"github.com/devNica/mochileros/entities"
 	"github.com/devNica/mochileros/exceptions"
-	"github.com/devNica/mochileros/models"
 	"github.com/devNica/mochileros/repositories"
 	"github.com/devNica/mochileros/services"
 	"github.com/google/uuid"
@@ -25,11 +25,11 @@ func NewUserAccountSrvExecutor(repo *repositories.UserAccountRepo, argon *config
 	return &userAccountServiceExecutor{UserAccountRepo: *repo, Argon2Config: *argon}
 }
 
-func (srv *userAccountServiceExecutor) UserAccountRegister(ctx context.Context, requestModel models.UserAccounRequestModel) {
-	commons.ValidateModel(requestModel)
-	hash := argon2.GeneratePassworHash(requestModel.Password, &srv.Argon2Config)
+func (srv *userAccountServiceExecutor) UserAccountRegister(ctx context.Context, newUser request.UserAccounRequestModel) {
+	commons.ValidateModel(newUser)
+	hash := argon2.GeneratePassworHash(newUser.Password, &srv.Argon2Config)
 	account := entities.UserAccount{
-		Email:     requestModel.Email,
+		Email:     newUser.Email,
 		Password:  hash,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
@@ -39,14 +39,14 @@ func (srv *userAccountServiceExecutor) UserAccountRegister(ctx context.Context, 
 	exceptions.PanicLogging(err)
 }
 
-func (srv *userAccountServiceExecutor) RegisterKYC(ctx context.Context, kycModel models.KYCRequestModel) {
+func (srv *userAccountServiceExecutor) RegisterKYC(ctx context.Context, kyc request.KYCRequestModel) {
 
-	userId, err := uuid.Parse(kycModel.UserId)
+	userId, err := uuid.Parse(kyc.UserId)
 	exceptions.PanicLogging(err)
 
 	kycEntity := entities.UserInfo{
-		FirstName: kycModel.FirstName,
-		LastName:  kycModel.LastName,
+		FirstName: kyc.FirstName,
+		LastName:  kyc.LastName,
 		UserId:    userId,
 	}
 
@@ -76,11 +76,8 @@ func (srv *userAccountServiceExecutor) GetCompleteUserInfo(ctx context.Context, 
 	return user
 }
 
-func (srv *userAccountServiceExecutor) ChangeAccountStatus(ctx context.Context, userId string) models.UpdateUserAccountStatusResModel {
+func (srv *userAccountServiceExecutor) ChangeAccountStatus(ctx context.Context, userId string) response.UserResponseModel {
 	response, err := srv.UserAccountRepo.UpdateUserAccountStatus(ctx, userId)
 	exceptions.PanicLogging(err)
-	return models.UpdateUserAccountStatusResModel{
-		UserId:   response.Id,
-		IsActive: response.IsActive,
-	}
+	return response
 }
