@@ -19,6 +19,7 @@ func NewhotelController(srv *services.HotelService, config configurations.Config
 
 func (controller hotelController) Route(app *fiber.App) {
 	app.Post("/mochileros/v1/user/:userId/hotel", controller.RegisterHotel)
+	app.Get("/mochileros/v1/user/:userId/hotel", controller.GetAllByOwnerId)
 }
 
 func (controller hotelController) RegisterHotel(c *fiber.Ctx) error {
@@ -35,5 +36,15 @@ func (controller hotelController) RegisterHotel(c *fiber.Ctx) error {
 		Code:    201,
 		Message: "Sucessfull Requets",
 		Data:    "",
+	})
+}
+
+func (controller hotelController) GetAllByOwnerId(c *fiber.Ctx) error {
+
+	response := controller.HotelService.GetAllByOwnerId(c.Context(), c.Params("userId"))
+	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
+		Code:    201,
+		Message: "Sucessfull Requets",
+		Data:    response,
 	})
 }

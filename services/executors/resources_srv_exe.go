@@ -3,6 +3,7 @@ package executors
 import (
 	"context"
 
+	"github.com/devNica/mochileros/dto/response"
 	"github.com/devNica/mochileros/exceptions"
 	"github.com/devNica/mochileros/models"
 	"github.com/devNica/mochileros/repositories"
@@ -47,26 +48,11 @@ func (repo *resourcesServiceExecutor) GetAll(ctx context.Context) (responses []m
 
 }
 
-func (repo *resourcesServiceExecutor) GetCountryByName(ctx context.Context, countryName string) (responses models.Country) {
+func (repo *resourcesServiceExecutor) GetCountryByName(ctx context.Context, countryName string) response.CountryResponseModel {
 
 	country, err := repo.CountryRepo.FetchCountryByName(ctx, countryName)
 	exceptions.PanicLogging(err)
 
-	return models.Country{
-		Id:          country.Id,
-		Name:        country.Name,
-		Capital:     country.Capital,
-		Cca3:        country.Cca3,
-		CallingCode: country.CallingCode,
-		TimeZones:   country.TimeZones,
-		States:      country.States,
-		Latitude:    country.Latitude,
-		Longitude:   country.Longitude,
-		FlagPng:     country.FlagPng,
-		FlagSvg:     country.FlagSvg,
-		CurrCode:    country.CurrCode,
-		CurrName:    country.CurrName,
-		CurrSymbol:  country.CurrSymbol,
-	}
+	return country
 
 }

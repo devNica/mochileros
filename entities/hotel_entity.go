@@ -18,3 +18,8 @@ type Hotel struct {
 	OwnerId            uuid.UUID `gorm:"column:owner_id;primaryKey"`
 	CountryID          uint16    `gorm:"column:country_id;primaryKey"`
 }
+
+type CountryInfo struct {
+	HotelId     uuid.UUID `json:"hotel_id"`
+	CountryName string    `json:"country_name"`
+}

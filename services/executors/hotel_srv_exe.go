@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/devNica/mochileros/commons"
+	"github.com/devNica/mochileros/dto/response"
 	"github.com/devNica/mochileros/entities"
 	"github.com/devNica/mochileros/exceptions"
 	"github.com/devNica/mochileros/models"
@@ -42,4 +43,11 @@ func (repo *hotelServiceExecutor) RegisterHotel(ctx context.Context, hotelReq mo
 
 	err := repo.HotelRepo.InsertHotel(ctx, hotel)
 	exceptions.PanicLogging(err)
+}
+
+func (repo *hotelServiceExecutor) GetAllByOwnerId(ctx context.Context, ownerId string) []response.HotelResponseModel {
+	hotelsE, error := repo.HotelRepo.FetchAllByOwnerID(ctx, ownerId)
+	exceptions.PanicLogging(error)
+
+	return hotelsE
 }

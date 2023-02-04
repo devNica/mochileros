@@ -7,6 +7,7 @@ import (
 	"github.com/devNica/mochileros/commons"
 	argon2 "github.com/devNica/mochileros/commons/argon"
 	"github.com/devNica/mochileros/configurations"
+	"github.com/devNica/mochileros/dto/response"
 	"github.com/devNica/mochileros/entities"
 	"github.com/devNica/mochileros/exceptions"
 	"github.com/devNica/mochileros/models"
@@ -52,8 +53,8 @@ func (srv *userAccountServiceExecutor) RegisterKYC(ctx context.Context, kycModel
 	srv.UserAccountRepo.InsertKYC(ctx, kycEntity)
 }
 
-func (srv *userAccountServiceExecutor) GetUserByEmail(ctx context.Context, email string) models.UserResponseModel {
-	userAccount, err := srv.UserAccountRepo.FetchUserByEmail(ctx, email)
+func (srv *userAccountServiceExecutor) GetUserByEmail(ctx context.Context, email string) response.UserResponseModel {
+	account, err := srv.UserAccountRepo.FetchUserByEmail(ctx, email)
 
 	if err != nil {
 		panic(exceptions.NotFoundError{
@@ -61,35 +62,18 @@ func (srv *userAccountServiceExecutor) GetUserByEmail(ctx context.Context, email
 		})
 	}
 
-	return models.UserResponseModel{
-		Id:        userAccount.Id,
-		Email:     userAccount.Email,
-		IsActive:  userAccount.IsActive,
-		CreatedAt: userAccount.CreatedAt,
-	}
+	return account
 }
 
-func (srv *userAccountServiceExecutor) GetCompleteUserInfo(ctx context.Context, userId string) models.KYCResponseModel {
-	profile, user, err := srv.UserAccountRepo.FetchCompleteUserInfo(ctx, userId)
+func (srv *userAccountServiceExecutor) GetCompleteUserInfo(ctx context.Context, userId string) response.UserInfoResponseModel {
+	user, err := srv.UserAccountRepo.FetchCompleteUserInfo(ctx, userId)
 	if err != nil {
 		panic(exceptions.NotFoundError{
 			Message: err.Error(),
 		})
 	}
 
-	return models.KYCResponseModel{
-		Id:       user.Id,
-		Email:    user.Email,
-		IsActive: user.IsActive,
-		KYC: struct {
-			FirstName string
-			LastName  string
-		}{
-			FirstName: user.UserKYC.FirstName,
-			LastName:  user.UserKYC.LastName,
-		},
-		Profile: profile.Profile,
-	}
+	return user
 }
 
 func (srv *userAccountServiceExecutor) ChangeAccountStatus(ctx context.Context, userId string) models.UpdateUserAccountStatusResModel {
