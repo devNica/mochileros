@@ -20,19 +20,16 @@ func main() {
 
 	// repositories
 	userAccountRepository := repository.NewUserAccountExecutor(conn)
-	migrationRepository := repository.NewMigrationExecutor(conn)
 	countryRepository := repository.NewCountryRepoExecutor(conn)
 	hotelRepository := repository.NewHotelRepoExecutor(conn)
 
 	//services
 	UserAccountService := service.NewUserAccountSrvExecutor(&userAccountRepository, &argon)
-	MigrationService := service.NewMigrationServiceExecutor(&migrationRepository)
 	ResourcesService := service.NewResourcesServiceExecutor(&countryRepository)
 	HotelService := service.NewHotelServiceExecutor(&hotelRepository)
 
 	//controllers
 	userAccountController := controllers.NewUserAccountController(&UserAccountService, config)
-	migrationController := controllers.NewMigrationController(&MigrationService, config)
 	propsController := controllers.NewPropsController(&ResourcesService, config)
 	hotelController := controllers.NewOwnerController(&HotelService, config)
 
@@ -47,7 +44,6 @@ func main() {
 
 	// routing
 	userAccountController.Route(app)
-	migrationController.Route(app)
 	propsController.Route(app)
 	hotelController.Route(app)
 

@@ -9,4 +9,5 @@ import (
 type PropsService interface {
 	GetAll(ctx context.Context) []response.CountryResponseModel
 	GetCountryByName(ctx context.Context, countryName string) response.CountryResponseModel
+	MigrateCountryInfo(ctx context.Context)
 }

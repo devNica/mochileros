@@ -34,7 +34,6 @@ func (repo *hotelServiceExecutor) RegisterHotel(ctx context.Context, newHotel re
 		Address:            newHotel.Address,
 		ServicePhoneNumber: newHotel.ServicePhoneNumber,
 		State:              newHotel.State,
-		IsActive:           true,
 		Province:           newHotel.Province,
 		CreatedAt:          time.Now(),
 		OwnerId:            ownerId,

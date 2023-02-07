@@ -3,9 +3,11 @@ package executors
 import (
 	"context"
 	"errors"
+	"log"
 
 	"github.com/devNica/mochileros/dto/response"
 	"github.com/devNica/mochileros/entities"
+	"github.com/devNica/mochileros/exceptions"
 	"github.com/devNica/mochileros/repositories"
 	"gorm.io/gorm"
 )
@@ -16,6 +18,17 @@ type countryRepoExecutor struct {
 
 func NewCountryRepoExecutor(DB *gorm.DB) repositories.CountryRepo {
 	return &countryRepoExecutor{DB: DB}
+}
+
+func (repo *countryRepoExecutor) InsertCountries(ctx context.Context, country []entities.Country) error {
+	for i := 0; i < len(country); i++ {
+		err := repo.DB.WithContext(ctx).Create(&country).Error
+		if err != nil {
+			log.Println(country[i].Id, '-', country[i].Name)
+			exceptions.PanicLogging(err)
+		}
+	}
+	return nil
 }
 
 func (repo *countryRepoExecutor) FetchAll(ctx context.Context) ([]response.CountryResponseModel, error) {

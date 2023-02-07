@@ -30,7 +30,7 @@ func (repo *userAccountExecutor) UserInsert(ctx context.Context, userAccount ent
 			return err
 		}
 
-		profile := entities.UserHasProfile{
+		profile := entities.UserProfiles{
 			UserId:    userAccount.Id,
 			ProfileId: 2,
 		}

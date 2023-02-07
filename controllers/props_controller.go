@@ -19,6 +19,7 @@ func NewPropsController(srv *services.PropsService, config configurations.Config
 func (controller propsController) Route(app *fiber.App) {
 	app.Get("/mochileros/v1/props/country", controller.GetAllCountries)
 	app.Get("/mochileros/v1/props/country/:name/", controller.GetCountryByName)
+	app.Get("/mochileros/v1/props/migrate/country", controller.MigrateCountryInfo)
 }
 
 func (controller propsController) GetAllCountries(c *fiber.Ctx) error {
@@ -38,5 +39,15 @@ func (controller propsController) GetCountryByName(c *fiber.Ctx) error {
 		Code:    201,
 		Message: "Sucessfull Requets",
 		Data:    response,
+	})
+}
+
+func (controller propsController) MigrateCountryInfo(c *fiber.Ctx) error {
+
+	controller.PropsService.MigrateCountryInfo(c.Context())
+	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
+		Code:    201,
+		Message: "Countries has been migrated",
+		Data:    "",
 	})
 }
