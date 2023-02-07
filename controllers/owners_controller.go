@@ -1,6 +1,9 @@
 package controllers
 
 import (
+	"bytes"
+	"io"
+
 	"github.com/devNica/mochileros/configurations"
 	"github.com/devNica/mochileros/dto/request"
 	"github.com/devNica/mochileros/exceptions"
@@ -14,8 +17,8 @@ type hotelController struct {
 	configurations.Config
 }
 
-func NewOwnerController(srv *services.HotelService, config configurations.Config) *hotelController {
-	return &hotelController{HotelService: *srv, Config: config}
+func NewOwnerController(hotelSrv *services.HotelService, config configurations.Config) *hotelController {
+	return &hotelController{HotelService: *hotelSrv, Config: config}
 }
 
 func (controller hotelController) Route(app *fiber.App) {
@@ -26,11 +29,26 @@ func (controller hotelController) Route(app *fiber.App) {
 func (controller hotelController) RegisterHotel(c *fiber.Ctx) error {
 
 	var hotel request.HotelRequestModel
+	var fileReq request.FileRequestModel
 
-	err := c.BodyParser(&hotel)
-	exceptions.PanicLogging(err)
+	file, paramsFileErr := c.FormFile("hotelAsset")
+	exceptions.PanicLogging(paramsFileErr)
 
-	controller.HotelService.RegisterHotel(c.Context(), hotel)
+	buffer, bufferErr := file.Open()
+	exceptions.PanicLogging(bufferErr)
+	defer buffer.Close()
+
+	buf := bytes.NewBuffer(nil)
+	io.Copy(buf, buffer)
+
+	fileReq.Buffer = buf.Bytes()
+	fileReq.Filetype = file.Header.Get("Content-Type")
+	fileReq.Filesize = int(file.Size)
+
+	parserErr := c.BodyParser(&hotel)
+	exceptions.PanicLogging(parserErr)
+
+	controller.HotelService.RegisterHotel(c.Context(), hotel, fileReq)
 	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
 		Code:    201,
 		Message: "Sucessfull Requets",

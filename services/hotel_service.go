@@ -8,6 +8,6 @@ import (
 )
 
 type HotelService interface {
-	RegisterHotel(ctx context.Context, newHotel request.HotelRequestModel)
+	RegisterHotel(ctx context.Context, newHotel request.HotelRequestModel, newFile request.FileRequestModel)
 	GetListOwnerHotels(ctx context.Context, ownerId string) []response.HotelResponseModel
 }

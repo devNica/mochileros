@@ -16,13 +16,14 @@ import (
 
 type hotelServiceExecutor struct {
 	repositories.HotelRepo
+	repositories.FileRepository
 }
 
-func NewHotelServiceExecutor(repo *repositories.HotelRepo) services.HotelService {
-	return &hotelServiceExecutor{HotelRepo: *repo}
+func NewHotelServiceExecutor(hotelRepo *repositories.HotelRepo, fileRepo *repositories.FileRepository) services.HotelService {
+	return &hotelServiceExecutor{HotelRepo: *hotelRepo, FileRepository: *fileRepo}
 }
 
-func (repo *hotelServiceExecutor) RegisterHotel(ctx context.Context, newHotel request.HotelRequestModel) {
+func (repo *hotelServiceExecutor) RegisterHotel(ctx context.Context, newHotel request.HotelRequestModel, newFile request.FileRequestModel) {
 	commons.ValidateModel(newHotel)
 
 	ownerId, errParse := uuid.Parse(newHotel.OwnerId)
@@ -40,8 +41,19 @@ func (repo *hotelServiceExecutor) RegisterHotel(ctx context.Context, newHotel re
 		CountryID:          newHotel.CountryID,
 	}
 
-	err := repo.HotelRepo.InsertHotel(ctx, hotel)
+	hotelId, err := repo.HotelRepo.InsertHotel(ctx, hotel)
 	exceptions.PanicLogging(err)
+
+	asset := entities.File{
+		Filename: uuid.New(),
+		Filetype: newFile.Filetype,
+		Filesize: newFile.Filesize,
+		Binary:   newFile.Buffer,
+	}
+
+	fileError := repo.FileRepository.InsertAssetByHotelId(ctx, asset, hotelId)
+	exceptions.PanicLogging(fileError)
+
 }
 
 func (repo *hotelServiceExecutor) GetListOwnerHotels(ctx context.Context, ownerId string) []response.HotelResponseModel {

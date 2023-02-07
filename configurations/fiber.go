@@ -7,6 +7,7 @@ import (
 
 func NewFiber() fiber.Config {
 	return fiber.Config{
+		BodyLimit:    5 * 1024 * 1024, //Limit upload file 5mb
 		ErrorHandler: exceptions.ErrorHandler,
 	}
 }

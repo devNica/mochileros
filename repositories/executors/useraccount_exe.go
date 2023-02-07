@@ -104,8 +104,8 @@ func (repo *userAccountExecutor) FetchCompleteUserInfo(ctx context.Context, user
 
 		from user_account ua 
 		join user_info ui on ui.user_id = ua.id
-		join user_has_profile uhp on uhp.user_id = ua.id
-		join profile p on p.id = uhp.profile_id
+		join user_profiles up on up.user_id = ua.id
+		join profile p on p.id = up.profile_id
 		where ua.id =?
 		`, userId).Scan(&model)
 

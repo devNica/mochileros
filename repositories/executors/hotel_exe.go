@@ -19,11 +19,11 @@ func NewHotelRepoExecutor(DB *gorm.DB) repositories.HotelRepo {
 	return &hotelRepoExecutor{DB: DB}
 }
 
-func (repo *hotelRepoExecutor) InsertHotel(ctx context.Context, hotel entities.Hotel) error {
+func (repo *hotelRepoExecutor) InsertHotel(ctx context.Context, hotel entities.Hotel) (uuid.UUID, error) {
 	hotel.Id = uuid.New()
 	err := repo.DB.WithContext(ctx).Create(&hotel).Error
 	exceptions.PanicLogging(err)
-	return nil
+	return hotel.Id, err
 }
 
 func (repo *hotelRepoExecutor) FetchListOwnerHotels(ctx context.Context, ownerId string) ([]response.HotelResponseModel, error) {

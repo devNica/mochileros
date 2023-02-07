@@ -22,6 +22,6 @@ type Hotel struct {
 
 type HotelStatus struct {
 	Id        uint16  `gorm:"primaryKey;column:id;autoIncrement;not null;unique"`
-	Status    string  `gorm:"column:status;type:varchar(50);not null; unique"`
+	Status    string  `gorm:"column:status;type:varchar(200);not null; unique"`
 	HotelInfo []Hotel `gorm:"foreignKey:status_id"`
 }
