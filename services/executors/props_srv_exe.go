@@ -9,15 +9,15 @@ import (
 	"github.com/devNica/mochileros/services"
 )
 
-type resourcesServiceExecutor struct {
+type propsServiceExecutor struct {
 	repositories.CountryRepo
 }
 
-func NewResourcesServiceExecutor(repo *repositories.CountryRepo) services.ResourcesService {
-	return &resourcesServiceExecutor{CountryRepo: *repo}
+func NewResourcesServiceExecutor(repo *repositories.CountryRepo) services.PropsService {
+	return &propsServiceExecutor{CountryRepo: *repo}
 }
 
-func (repo *resourcesServiceExecutor) GetAll(ctx context.Context) []response.CountryResponseModel {
+func (repo *propsServiceExecutor) GetAll(ctx context.Context) []response.CountryResponseModel {
 
 	countries, err := repo.CountryRepo.FetchAll(ctx)
 	exceptions.PanicLogging(err)
@@ -47,7 +47,7 @@ func (repo *resourcesServiceExecutor) GetAll(ctx context.Context) []response.Cou
 
 }
 
-func (repo *resourcesServiceExecutor) GetCountryByName(ctx context.Context, countryName string) response.CountryResponseModel {
+func (repo *propsServiceExecutor) GetCountryByName(ctx context.Context, countryName string) response.CountryResponseModel {
 
 	country, err := repo.CountryRepo.FetchCountryByName(ctx, countryName)
 	exceptions.PanicLogging(err)

@@ -26,15 +26,15 @@ func (repo *hotelRepoExecutor) InsertHotel(ctx context.Context, hotel entities.H
 	return nil
 }
 
-func (repo *hotelRepoExecutor) FetchAllByOwnerID(ctx context.Context, ownerId string) ([]response.HotelResponseModel, error) {
+func (repo *hotelRepoExecutor) FetchListOwnerHotels(ctx context.Context, ownerId string) ([]response.HotelResponseModel, error) {
 
 	var hotels []response.HotelResponseModel
 
-	repo.DB.WithContext(ctx).
+	repo.DB.
 		Table("hotel").
-		Select("hotel.id, hotel.name_hotel, hotel.address, hotel.service_phone_number, hotel.state, hotel.province, c.name as country").
-		Joins("join country c on c.id = hotel.country_id").
-		Find(&hotels).Where("hotel.owner_id = ?", ownerId)
+		Select("hotel.id as hotel_id, hotel.name_hotel, hotel.address, hotel.service_phone_number, hotel.state, hotel.province, c.name as country").
+		Joins("inner join country c on c.id = hotel.country_id").
+		Where("hotel.owner_id = ?", ownerId).Scan(&hotels)
 
 	return hotels, nil
 }

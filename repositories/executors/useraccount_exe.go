@@ -106,10 +106,11 @@ func (repo *userAccountExecutor) FetchCompleteUserInfo(ctx context.Context, user
 		join user_info ui on ui.user_id = ua.id
 		join user_has_profile uhp on uhp.user_id = ua.id
 		join profile p on p.id = uhp.profile_id
-		`).Scan(&model)
+		where ua.id =?
+		`, userId).Scan(&model)
 
 	if result.RowsAffected == 0 {
-		return response.UserInfoResponseModel{}, errors.New("Complete User Info Not Found")
+		return response.UserInfoResponseModel{}, errors.New("User not found")
 	}
 
 	Account := response.UserInfoResponseModel{

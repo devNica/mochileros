@@ -9,5 +9,5 @@ import (
 
 type HotelRepo interface {
 	InsertHotel(ctx context.Context, entity entities.Hotel) error
-	FetchAllByOwnerID(ctx context.Context, ownerId string) ([]response.HotelResponseModel, error)
+	FetchListOwnerHotels(ctx context.Context, ownerId string) ([]response.HotelResponseModel, error)
 }

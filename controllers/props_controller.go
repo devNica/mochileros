@@ -8,12 +8,12 @@ import (
 )
 
 type propsController struct {
-	services.ResourcesService
+	services.PropsService
 	configurations.Config
 }
 
-func NewPropsController(srv *services.ResourcesService, config configurations.Config) *propsController {
-	return &propsController{ResourcesService: *srv, Config: config}
+func NewPropsController(srv *services.PropsService, config configurations.Config) *propsController {
+	return &propsController{PropsService: *srv, Config: config}
 }
 
 func (controller propsController) Route(app *fiber.App) {
@@ -23,7 +23,7 @@ func (controller propsController) Route(app *fiber.App) {
 
 func (controller propsController) GetAllCountries(c *fiber.Ctx) error {
 
-	response := controller.ResourcesService.GetAll(c.Context())
+	response := controller.PropsService.GetAll(c.Context())
 	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
 		Code:    201,
 		Message: "Sucessfull Requets",
@@ -33,7 +33,7 @@ func (controller propsController) GetAllCountries(c *fiber.Ctx) error {
 
 func (controller propsController) GetCountryByName(c *fiber.Ctx) error {
 
-	response := controller.ResourcesService.GetCountryByName(c.Context(), c.Params("name"))
+	response := controller.PropsService.GetCountryByName(c.Context(), c.Params("name"))
 	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
 		Code:    201,
 		Message: "Sucessfull Requets",

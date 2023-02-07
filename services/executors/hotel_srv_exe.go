@@ -45,8 +45,8 @@ func (repo *hotelServiceExecutor) RegisterHotel(ctx context.Context, newHotel re
 	exceptions.PanicLogging(err)
 }
 
-func (repo *hotelServiceExecutor) GetAllByOwnerId(ctx context.Context, ownerId string) []response.HotelResponseModel {
-	hotelsE, error := repo.HotelRepo.FetchAllByOwnerID(ctx, ownerId)
+func (repo *hotelServiceExecutor) GetListOwnerHotels(ctx context.Context, ownerId string) []response.HotelResponseModel {
+	hotelsE, error := repo.HotelRepo.FetchListOwnerHotels(ctx, ownerId)
 	exceptions.PanicLogging(error)
 
 	return hotelsE

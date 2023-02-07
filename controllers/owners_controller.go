@@ -14,13 +14,13 @@ type hotelController struct {
 	configurations.Config
 }
 
-func NewhotelController(srv *services.HotelService, config configurations.Config) *hotelController {
+func NewOwnerController(srv *services.HotelService, config configurations.Config) *hotelController {
 	return &hotelController{HotelService: *srv, Config: config}
 }
 
 func (controller hotelController) Route(app *fiber.App) {
-	app.Post("/mochileros/v1/user/:userId/hotel", controller.RegisterHotel)
-	app.Get("/mochileros/v1/user/:userId/hotel", controller.GetAllByOwnerId)
+	app.Post("/mochileros/v1/owner/hotel", controller.RegisterHotel)
+	app.Get("/mochileros/v1/owner/:ownerId/hotel", controller.ListOwnerHotels)
 }
 
 func (controller hotelController) RegisterHotel(c *fiber.Ctx) error {
@@ -30,8 +30,6 @@ func (controller hotelController) RegisterHotel(c *fiber.Ctx) error {
 	err := c.BodyParser(&hotel)
 	exceptions.PanicLogging(err)
 
-	hotel.OwnerId = c.Params("userId")
-
 	controller.HotelService.RegisterHotel(c.Context(), hotel)
 	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
 		Code:    201,
@@ -40,9 +38,9 @@ func (controller hotelController) RegisterHotel(c *fiber.Ctx) error {
 	})
 }
 
-func (controller hotelController) GetAllByOwnerId(c *fiber.Ctx) error {
+func (controller hotelController) ListOwnerHotels(c *fiber.Ctx) error {
 
-	response := controller.HotelService.GetAllByOwnerId(c.Context(), c.Params("userId"))
+	response := controller.HotelService.GetListOwnerHotels(c.Context(), c.Params("ownerId"))
 	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
 		Code:    201,
 		Message: "Sucessfull Requets",

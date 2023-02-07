@@ -34,7 +34,7 @@ func main() {
 	userAccountController := controllers.NewUserAccountController(&UserAccountService, config)
 	migrationController := controllers.NewMigrationController(&MigrationService, config)
 	propsController := controllers.NewPropsController(&ResourcesService, config)
-	hotelController := controllers.NewhotelController(&HotelService, config)
+	hotelController := controllers.NewOwnerController(&HotelService, config)
 
 	//setup fiber
 	app := fiber.New(configurations.NewFiber())
