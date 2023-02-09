@@ -3,8 +3,11 @@ package executors
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strings"
 
+	"github.com/devNica/mochileros/commons/encryptors/cipher"
 	"github.com/devNica/mochileros/dto/response"
 	"github.com/devNica/mochileros/entities"
 	"github.com/devNica/mochileros/exceptions"
@@ -98,4 +101,23 @@ func (repo *propsServiceExecutor) GetCountryByName(ctx context.Context, countryN
 
 	return country
 
+}
+
+func (repo *propsServiceExecutor) DownloadHotelAsset(ctx context.Context, filekey string) {
+	str, err := cipher.Decrypt(filekey)
+	exceptions.PanicLogging(err)
+
+	type FileModel struct {
+		Filename string `json:"filename"`
+		Filetype string `json:"filetype"`
+	}
+
+	s := strings.Split(str, ",")
+
+	file := FileModel{
+		Filename: s[0],
+		Filetype: s[1],
+	}
+
+	fmt.Println(file)
 }

@@ -20,6 +20,7 @@ func (controller propsController) Route(app *fiber.App) {
 	app.Get("/mochileros/v1/props/country", controller.GetAllCountries)
 	app.Get("/mochileros/v1/props/country/:name/", controller.GetCountryByName)
 	app.Get("/mochileros/v1/props/migrate/country", controller.MigrateCountryInfo)
+	app.Get("/mochileros/v1/props/:filekey", controller.DownloadAsset)
 }
 
 func (controller propsController) GetAllCountries(c *fiber.Ctx) error {
@@ -49,5 +50,18 @@ func (controller propsController) MigrateCountryInfo(c *fiber.Ctx) error {
 		Code:    201,
 		Message: "Countries has been migrated",
 		Data:    "",
+	})
+}
+
+func (controller propsController) DownloadAsset(c *fiber.Ctx) error {
+
+	v := c.Params("filekey")
+
+	controller.PropsService.DownloadHotelAsset(c.Context(), v)
+
+	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
+		Code:    200,
+		Message: "download file successfully",
+		Data:    v,
 	})
 }
