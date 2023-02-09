@@ -2,9 +2,11 @@ package executors
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/devNica/mochileros/commons"
+	"github.com/devNica/mochileros/commons/encryptors/cipher"
 	"github.com/devNica/mochileros/dto/request"
 	"github.com/devNica/mochileros/dto/response"
 	"github.com/devNica/mochileros/entities"
@@ -17,6 +19,15 @@ import (
 type hotelServiceExecutor struct {
 	repositories.HotelRepo
 	repositories.FileRepository
+}
+
+type FileModel struct {
+	Filename string
+	Filetype string
+}
+
+func (f FileModel) StructToString() string {
+	return fmt.Sprintf("%+v", f)
 }
 
 func NewHotelServiceExecutor(hotelRepo *repositories.HotelRepo, fileRepo *repositories.FileRepository) services.HotelService {
@@ -56,9 +67,38 @@ func (repo *hotelServiceExecutor) RegisterHotel(ctx context.Context, newHotel re
 
 }
 
-func (repo *hotelServiceExecutor) GetListOwnerHotels(ctx context.Context, ownerId string) []response.HotelResponseModel {
-	hotelsE, error := repo.HotelRepo.FetchListOwnerHotels(ctx, ownerId)
+func (repo *hotelServiceExecutor) GetListOwnerHotels(ctx context.Context, baseURL, ownerId string) []response.HotelResponseModel {
+	hotelRepModel, error := repo.HotelRepo.FetchListOwnerHotels(ctx, ownerId)
 	exceptions.PanicLogging(error)
 
-	return hotelsE
+	var hotels []response.HotelResponseModel
+
+	for _, hotel := range hotelRepModel {
+
+		// file := FileModel{
+		// 	Filename: hotel.Filename.String(),
+		// 	Filetype: hotel.Filetype,
+		// }
+
+		// v := file.StructToString()
+		v := fmt.Sprintf("%s,%s", hotel.Filename, hotel.Filetype)
+
+		url, err := cipher.Encrypt(v)
+		exceptions.PanicLogging(err)
+
+		prefix := "/mochileros/v1/props/"
+
+		hotels = append(hotels, response.HotelResponseModel{
+			HotelId:            hotel.HotelId,
+			NameHotel:          hotel.NameHotel,
+			Address:            hotel.Address,
+			ServicePhoneNumber: hotel.ServicePhoneNumber,
+			Country:            hotel.Country,
+			State:              hotel.State,
+			Province:           hotel.Province,
+			Url:                fmt.Sprintf("%s%s%s", baseURL, prefix, url),
+		})
+	}
+
+	return hotels
 }

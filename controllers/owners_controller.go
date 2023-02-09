@@ -58,7 +58,7 @@ func (controller hotelController) RegisterHotel(c *fiber.Ctx) error {
 
 func (controller hotelController) ListOwnerHotels(c *fiber.Ctx) error {
 
-	response := controller.HotelService.GetListOwnerHotels(c.Context(), c.Params("ownerId"))
+	response := controller.HotelService.GetListOwnerHotels(c.Context(), c.BaseURL(), c.Params("ownerId"))
 	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
 		Code:    201,
 		Message: "Sucessfull Requets",
