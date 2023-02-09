@@ -3,16 +3,17 @@ package executors
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/devNica/mochileros/commons/encryptors/cipher"
+	"github.com/devNica/mochileros/dto/request"
 	"github.com/devNica/mochileros/dto/response"
 	"github.com/devNica/mochileros/entities"
 	"github.com/devNica/mochileros/exceptions"
 	"github.com/devNica/mochileros/repositories"
 	"github.com/devNica/mochileros/services"
+	"github.com/google/uuid"
 )
 
 func GetJson(url string, target interface{}) error {
@@ -45,10 +46,11 @@ func GetJson(url string, target interface{}) error {
 
 type propsServiceExecutor struct {
 	repositories.CountryRepo
+	repositories.FileRepo
 }
 
-func NewResourcesServiceExecutor(repo *repositories.CountryRepo) services.PropsService {
-	return &propsServiceExecutor{CountryRepo: *repo}
+func NewResourcesServiceExecutor(Country *repositories.CountryRepo, File *repositories.FileRepo) services.PropsService {
+	return &propsServiceExecutor{CountryRepo: *Country, FileRepo: *File}
 }
 
 func (repo *propsServiceExecutor) MigrateCountryInfo(ctx context.Context) {
@@ -103,21 +105,26 @@ func (repo *propsServiceExecutor) GetCountryByName(ctx context.Context, countryN
 
 }
 
-func (repo *propsServiceExecutor) DownloadHotelAsset(ctx context.Context, filekey string) {
+func (repo *propsServiceExecutor) DownloadHotelAsset(ctx context.Context, filekey string) response.FileResponseModel {
 	str, err := cipher.Decrypt(filekey)
 	exceptions.PanicLogging(err)
 
-	type FileModel struct {
-		Filename string `json:"filename"`
-		Filetype string `json:"filetype"`
-	}
-
 	s := strings.Split(str, ",")
 
-	file := FileModel{
-		Filename: s[0],
+	filename, err := uuid.Parse(s[0])
+
+	file := request.FileDownloadRequestModel{
+		Filename: filename,
 		Filetype: s[1],
 	}
 
-	fmt.Println(file)
+	asset, err := repo.FileRepo.FetchHotelAsset(ctx, entities.File{
+		Filename: file.Filename,
+		Filetype: file.Filetype,
+	})
+
+	return response.FileResponseModel{
+		Filetype: asset.Filetype,
+		Binary:   asset.Binary,
+	}
 }

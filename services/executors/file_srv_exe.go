@@ -6,9 +6,9 @@ import (
 )
 
 type fileServiceExecutor struct {
-	repositories.FileRepository
+	repositories.FileRepo
 }
 
-func NewFileServiceExecutor(repo *repositories.FileRepository) services.FileService {
-	return &fileServiceExecutor{FileRepository: *repo}
+func NewFileServiceExecutor(repo *repositories.FileRepo) services.FileService {
+	return &fileServiceExecutor{FileRepo: *repo}
 }

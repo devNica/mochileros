@@ -26,7 +26,7 @@ func main() {
 
 	//services
 	UserAccountService := service.NewUserAccountSrvExecutor(&userAccountRepository, &argon)
-	ResourcesService := service.NewResourcesServiceExecutor(&countryRepository)
+	ResourcesService := service.NewResourcesServiceExecutor(&countryRepository, &fileRepository)
 	HotelService := service.NewHotelServiceExecutor(&hotelRepository, &fileRepository)
 
 	//controllers

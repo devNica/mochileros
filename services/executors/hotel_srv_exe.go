@@ -18,20 +18,20 @@ import (
 
 type hotelServiceExecutor struct {
 	repositories.HotelRepo
-	repositories.FileRepository
+	repositories.FileRepo
 }
 
-type FileModel struct {
-	Filename string
-	Filetype string
-}
+// type FileModel struct {
+// 	Filename string
+// 	Filetype string
+// }
 
-func (f FileModel) StructToString() string {
-	return fmt.Sprintf("%+v", f)
-}
+// func (f FileModel) StructToString() string {
+// 	return fmt.Sprintf("%+v", f)
+// }
 
-func NewHotelServiceExecutor(hotelRepo *repositories.HotelRepo, fileRepo *repositories.FileRepository) services.HotelService {
-	return &hotelServiceExecutor{HotelRepo: *hotelRepo, FileRepository: *fileRepo}
+func NewHotelServiceExecutor(hotelRepo *repositories.HotelRepo, fileRepo *repositories.FileRepo) services.HotelService {
+	return &hotelServiceExecutor{HotelRepo: *hotelRepo, FileRepo: *fileRepo}
 }
 
 func (repo *hotelServiceExecutor) RegisterHotel(ctx context.Context, newHotel request.HotelRequestModel, newFile request.FileRequestModel) {
@@ -62,7 +62,7 @@ func (repo *hotelServiceExecutor) RegisterHotel(ctx context.Context, newHotel re
 		Binary:   newFile.Buffer,
 	}
 
-	fileError := repo.FileRepository.InsertAssetByHotelId(ctx, asset, hotelId)
+	fileError := repo.FileRepo.InsertAssetByHotelId(ctx, asset, hotelId)
 	exceptions.PanicLogging(fileError)
 
 }

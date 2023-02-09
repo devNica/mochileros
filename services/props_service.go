@@ -10,5 +10,5 @@ type PropsService interface {
 	GetAll(ctx context.Context) []response.CountryResponseModel
 	GetCountryByName(ctx context.Context, countryName string) response.CountryResponseModel
 	MigrateCountryInfo(ctx context.Context)
-	DownloadHotelAsset(ctx context.Context, filekey string)
+	DownloadHotelAsset(ctx context.Context, filekey string) response.FileResponseModel
 }

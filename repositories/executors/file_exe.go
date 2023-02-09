@@ -2,6 +2,7 @@ package executors
 
 import (
 	"context"
+	"errors"
 
 	"github.com/devNica/mochileros/entities"
 	"github.com/devNica/mochileros/repositories"
@@ -13,7 +14,7 @@ type fileRepositoryExecutor struct {
 	*gorm.DB
 }
 
-func NewFileRepositoryExecutor(DB *gorm.DB) repositories.FileRepository {
+func NewFileRepositoryExecutor(DB *gorm.DB) repositories.FileRepo {
 	return &fileRepositoryExecutor{DB: DB}
 }
 
@@ -43,4 +44,14 @@ func (repo *fileRepositoryExecutor) InsertAssetByHotelId(ctx context.Context, ne
 	}
 
 	return nil
+}
+
+func (repo *fileRepositoryExecutor) FetchHotelAsset(ctx context.Context, fileModel entities.File) (entities.File, error) {
+	result := repo.DB.Select("binary").First(&fileModel)
+
+	if result.RowsAffected == 0 {
+		return entities.File{}, errors.New("Asset not found")
+	}
+
+	return fileModel, nil
 }

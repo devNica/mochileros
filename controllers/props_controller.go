@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"strconv"
+
 	"github.com/devNica/mochileros/configurations"
 	"github.com/devNica/mochileros/models"
 	"github.com/devNica/mochileros/services"
@@ -37,7 +39,7 @@ func (controller propsController) GetCountryByName(c *fiber.Ctx) error {
 
 	response := controller.PropsService.GetCountryByName(c.Context(), c.Params("name"))
 	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
-		Code:    201,
+		Code:    200,
 		Message: "Sucessfull Requets",
 		Data:    response,
 	})
@@ -57,11 +59,10 @@ func (controller propsController) DownloadAsset(c *fiber.Ctx) error {
 
 	v := c.Params("filekey")
 
-	controller.PropsService.DownloadHotelAsset(c.Context(), v)
+	response := controller.PropsService.DownloadHotelAsset(c.Context(), v)
 
-	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
-		Code:    200,
-		Message: "download file successfully",
-		Data:    v,
-	})
+	c.Set("Content-Type", response.Filetype)
+	c.Set("Content-Length", strconv.Itoa(len(response.Binary)))
+	return c.Send(response.Binary)
+
 }

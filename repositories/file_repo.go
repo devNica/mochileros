@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type FileRepository interface {
+type FileRepo interface {
 	InsertAssetByHotelId(ctx context.Context, newFile entities.File, hotelId uuid.UUID) error
+	FetchHotelAsset(ctx context.Context, model entities.File) (entities.File, error)
 }
