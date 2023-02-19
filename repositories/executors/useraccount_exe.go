@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/devNica/mochileros/dto/response"
@@ -92,22 +93,21 @@ func (repo *userAccountExecutor) FetchCompleteUserInfo(ctx context.Context, user
 
 	var model queryModel
 
-	result := repo.DB.Raw(`
-		Select 
-			ui.user_id, 
-			ua.email, 
-			ui.first_name, 
-			ui.last_name, 
-			ua.is_active,
-			p.profile,
-			ua.created_at
-
-		from user_account ua 
-		join user_info ui on ui.user_id = ua.id
-		join user_profiles up on up.user_id = ua.id
-		join profile p on p.id = up.profile_id
-		where ua.id =?
-		`, userId).Scan(&model)
+	result := repo.DB.Table("user_account").
+		Select(`
+		    user_account.id as user_id, 
+			user_account.email, 
+			user_info.first_name, 
+			user_info.last_name, 
+			user_account.is_active,
+			string_agg(distinct profile.profile, ',') as profile,
+			user_account.created_at
+		`).
+		Joins("inner join user_info on user_info.user_id = user_account.id").
+		Joins("inner join user_profiles on user_profiles.user_id = user_account.id").
+		Joins("inner join profile on profile.id = user_profiles.profile_id").
+		Where("user_account.id = ?", userId).Group("user_account.id, user_info.first_name, user_info.last_name").
+		Scan(&model)
 
 	if result.RowsAffected == 0 {
 		return response.UserInfoResponseModel{}, errors.New("User not found")
@@ -124,7 +124,7 @@ func (repo *userAccountExecutor) FetchCompleteUserInfo(ctx context.Context, user
 			FirstName: model.FirstName,
 			LastName:  model.LastName,
 		},
-		Profile:   model.Profile,
+		Profile:   strings.Split(model.Profile, ","),
 		CreatedAt: model.CreatedAt,
 	}
 

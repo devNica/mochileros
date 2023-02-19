@@ -1,3 +1,4 @@
 .env
 countries_states_cities.json
 country.json
+notes.go

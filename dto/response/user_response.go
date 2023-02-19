@@ -21,6 +21,6 @@ type UserInfoResponseModel struct {
 		FirstName string
 		LastName  string
 	}
-	Profile   string
+	Profile   []string
 	CreatedAt time.Time
 }
