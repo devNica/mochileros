@@ -12,7 +12,7 @@ import (
 func GenerateToken(UserId string, profiles []map[string]interface{}, config configurations.Config) string {
 
 	jwtSecret := config.Get("JWT_SECRET_KEY")
-	jwtExpired, err := strconv.Atoi(config.Get("JWT_EXPIRE_MIN"))
+	jwtExpired, err := strconv.Atoi(config.Get("JWT_EXPIRES_IN"))
 	exceptions.PanicLogging(err)
 
 	claims := jwt.MapClaims{

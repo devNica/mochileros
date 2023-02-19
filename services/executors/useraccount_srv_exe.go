@@ -19,10 +19,14 @@ import (
 type userAccountServiceExecutor struct {
 	repositories.UserAccountRepo
 	configurations.Argon2Config
+	configurations.Config
 }
 
-func NewUserAccountSrvExecutor(repo *repositories.UserAccountRepo, argon *configurations.Argon2Config) services.UserAccountService {
-	return &userAccountServiceExecutor{UserAccountRepo: *repo, Argon2Config: *argon}
+func NewUserAccountSrvExecutor(
+	repo *repositories.UserAccountRepo,
+	argon *configurations.Argon2Config,
+	config configurations.Config) services.UserAccountService {
+	return &userAccountServiceExecutor{UserAccountRepo: *repo, Argon2Config: *argon, Config: config}
 }
 
 func (srv *userAccountServiceExecutor) UserAccountRegister(ctx context.Context, newUser request.UserAccounRequestModel) {
@@ -53,27 +57,33 @@ func (srv *userAccountServiceExecutor) RegisterKYC(ctx context.Context, kyc requ
 	srv.UserAccountRepo.InsertKYC(ctx, kycEntity)
 }
 
-func (srv *userAccountServiceExecutor) GetUserByEmail(ctx context.Context, email string) response.UserResponseModel {
-	account, err := srv.UserAccountRepo.FetchUserByEmail(ctx, email)
-
+func (srv *userAccountServiceExecutor) UserLogin(ctx context.Context, user request.UserAccounRequestModel) response.LoginResponseModel {
+	result, err := srv.UserAccountRepo.FetchUserByEmail(ctx, user.Email)
 	if err != nil {
 		panic(exceptions.NotFoundError{
 			Message: err.Error(),
 		})
 	}
 
-	return account
-}
-
-func (srv *userAccountServiceExecutor) GetCompleteUserInfo(ctx context.Context, userId string) response.UserInfoResponseModel {
-	user, err := srv.UserAccountRepo.FetchCompleteUserInfo(ctx, userId)
-	if err != nil {
-		panic(exceptions.NotFoundError{
-			Message: err.Error(),
-		})
+	login := response.LoginResponseModel{
+		Id:        result.Id,
+		Email:     result.Email,
+		IsActive:  result.IsActive,
+		UserInfo:  result.UserInfo,
+		CreatedAt: result.CreatedAt,
 	}
 
-	return user
+	profiles := make([]map[string]interface{}, 0)
+
+	for _, val := range result.Profile {
+		item := make(map[string]interface{})
+		item["Role"] = val
+		profiles = append(profiles, item)
+	}
+
+	login.Token = commons.GenerateToken(login.Id, profiles, srv.Config)
+
+	return login
 }
 
 func (srv *userAccountServiceExecutor) ChangeAccountStatus(ctx context.Context, userId string) response.UserResponseModel {

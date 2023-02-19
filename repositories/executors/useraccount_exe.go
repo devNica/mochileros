@@ -3,7 +3,6 @@ package executors
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strings"
 	"time"
 
@@ -58,28 +57,7 @@ func (repo *userAccountExecutor) InsertKYC(ctx context.Context, kyc entities.Use
 	return nil
 }
 
-func (repo *userAccountExecutor) FetchUserByEmail(ctx context.Context, email string) (response.UserResponseModel, error) {
-
-	var foundUser entities.UserAccount
-
-	result := repo.DB.WithContext(ctx).Where("email = ?", email).First(&foundUser)
-	if result.RowsAffected == 0 {
-		return response.UserResponseModel{}, errors.New("user Not Found")
-	}
-
-	fmt.Println("user account", foundUser)
-
-	account := response.UserResponseModel{
-		Id:        foundUser.Id,
-		Email:     foundUser.Email,
-		IsActive:  foundUser.IsActive,
-		CreatedAt: foundUser.CreatedAt,
-	}
-
-	return account, nil
-}
-
-func (repo *userAccountExecutor) FetchCompleteUserInfo(ctx context.Context, userId string) (response.UserInfoResponseModel, error) {
+func (repo *userAccountExecutor) FetchUserByEmail(ctx context.Context, email string) (response.UserInfoResponseModel, error) {
 
 	type queryModel struct {
 		UserId    string
@@ -106,7 +84,7 @@ func (repo *userAccountExecutor) FetchCompleteUserInfo(ctx context.Context, user
 		Joins("inner join user_info on user_info.user_id = user_account.id").
 		Joins("inner join user_profiles on user_profiles.user_id = user_account.id").
 		Joins("inner join profile on profile.id = user_profiles.profile_id").
-		Where("user_account.id = ?", userId).Group("user_account.id, user_info.first_name, user_info.last_name").
+		Where("user_account.email = ?", email).Group("user_account.id, user_info.first_name, user_info.last_name").
 		Scan(&model)
 
 	if result.RowsAffected == 0 {

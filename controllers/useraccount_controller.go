@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"log"
-
 	"github.com/devNica/mochileros/configurations"
 	"github.com/devNica/mochileros/dto/request"
 	"github.com/devNica/mochileros/exceptions"
@@ -22,10 +20,9 @@ func NewUserAccountController(service *services.UserAccountService, config confi
 
 func (controller userAccountController) Route(app *fiber.App) {
 	app.Post("/mochileros/v1/account/customer", controller.Register)
-	app.Get("/mochileros/v1/account/user/:email", controller.GetUserByEmail)
 	app.Post("/mochileros/v1/account/user/:userId/kyc", controller.RegisterKYC)
-	app.Get("/mochileros/v1/account/user/:userId/info", controller.GetCompleteUserInfo)
 	app.Put("/mochileros/v1/account/user/:userId/status", controller.ChangeAccountStatus)
+	app.Post("/mochileros/v1/account/login", controller.UserLogin)
 }
 
 func (controller userAccountController) Register(c *fiber.Ctx) error {
@@ -39,20 +36,6 @@ func (controller userAccountController) Register(c *fiber.Ctx) error {
 		Message: "User has been registered successfull",
 		Data:    "",
 	})
-}
-
-func (controller userAccountController) GetUserByEmail(c *fiber.Ctx) error {
-
-	log.Println("es que entro aca")
-
-	response := controller.UserAccountService.GetUserByEmail(c.Context(), c.Params("email"))
-
-	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
-		Code:    201,
-		Message: "User has been registered successfull",
-		Data:    response,
-	})
-
 }
 
 func (controller userAccountController) RegisterKYC(c *fiber.Ctx) error {
@@ -71,20 +54,6 @@ func (controller userAccountController) RegisterKYC(c *fiber.Ctx) error {
 	})
 }
 
-func (controller userAccountController) GetCompleteUserInfo(c *fiber.Ctx) error {
-
-	userId := c.Params("userID")
-	log.Println("userId: ", userId)
-
-	response := controller.UserAccountService.GetCompleteUserInfo(c.Context(), userId)
-
-	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
-		Code:    200,
-		Message: "Success",
-		Data:    response,
-	})
-}
-
 func (controller userAccountController) ChangeAccountStatus(c *fiber.Ctx) error {
 	userId := c.Params("userID")
 
@@ -94,5 +63,19 @@ func (controller userAccountController) ChangeAccountStatus(c *fiber.Ctx) error 
 		Code:    200,
 		Message: "Success",
 		Data:    response,
+	})
+}
+
+func (controller userAccountController) UserLogin(c *fiber.Ctx) error {
+	var request request.UserAccounRequestModel
+	err := c.BodyParser(&request)
+	exceptions.PanicLogging(err)
+
+	user := controller.UserAccountService.UserLogin(c.Context(), request)
+
+	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
+		Code:    200,
+		Message: "Success",
+		Data:    user,
 	})
 }
