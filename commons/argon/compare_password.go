@@ -15,6 +15,7 @@ func ComparePasswordAndHash(password, encodeHash string, agc *configurations.Arg
 
 	p, salt, hash, error := decodeHash(encodeHash, agc)
 	if error != nil {
+		fmt.Println("entre en este bloque de error")
 		return false, error
 	}
 
@@ -25,10 +26,11 @@ func ComparePasswordAndHash(password, encodeHash string, agc *configurations.Arg
 		return true, nil
 	}
 
-	return false, nil
+	return false, errors.New("Password is wrong")
 }
 
 func decodeHash(encodedHash string, acg *configurations.Argon2Config) (p *configurations.Argon2Config, salt, hash []byte, err error) {
+
 	vals := strings.Split(encodedHash, "$")
 	if len(vals) != 6 {
 		return nil, nil, nil, errors.New("the encoded hash is not in the correct format")

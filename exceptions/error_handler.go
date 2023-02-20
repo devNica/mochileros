@@ -25,6 +25,15 @@ func ErrorHandler(ctx *fiber.Ctx, err error) error {
 
 	}
 
+	_, badRequestError := err.(BadReqquestError)
+	if badRequestError {
+		return ctx.Status(fiber.StatusBadRequest).JSON(models.GeneralResponseModel{
+			Code:    404,
+			Message: "Bad request",
+			Data:    err.Error(),
+		})
+	}
+
 	_, notFoundError := err.(NotFoundError)
 	if notFoundError {
 		return ctx.Status(fiber.StatusNotFound).JSON(models.GeneralResponseModel{

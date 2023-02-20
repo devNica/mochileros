@@ -9,7 +9,7 @@ type Argon2Config struct {
 }
 
 func NewArgonConfg() Argon2Config {
-	argonConfig := &Argon2Config{
+	argonConfig := Argon2Config{
 		Memory:      64 * 24,
 		Iterations:  3,
 		Parallelism: 2,
@@ -17,5 +17,5 @@ func NewArgonConfg() Argon2Config {
 		KeyLength:   32,
 	}
 
-	return *argonConfig
+	return argonConfig
 }

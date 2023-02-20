@@ -16,6 +16,7 @@ type UserResponseModel struct {
 type UserInfoResponseModel struct {
 	Id       string
 	Email    string
+	Password string
 	IsActive bool
 	UserInfo struct {
 		FirstName string

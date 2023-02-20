@@ -62,6 +62,7 @@ func (repo *userAccountExecutor) FetchUserByEmail(ctx context.Context, email str
 	type queryModel struct {
 		UserId    string
 		Email     string
+		Password  string
 		FirstName string
 		LastName  string
 		IsActive  bool
@@ -74,7 +75,8 @@ func (repo *userAccountExecutor) FetchUserByEmail(ctx context.Context, email str
 	result := repo.DB.Table("user_account").
 		Select(`
 		    user_account.id as user_id, 
-			user_account.email, 
+			user_account.email,
+			user_account.password, 
 			user_info.first_name, 
 			user_info.last_name, 
 			user_account.is_active,
@@ -94,6 +96,7 @@ func (repo *userAccountExecutor) FetchUserByEmail(ctx context.Context, email str
 	Account := response.UserInfoResponseModel{
 		Id:       model.UserId,
 		Email:    model.Email,
+		Password: model.Password,
 		IsActive: model.IsActive,
 		UserInfo: struct {
 			FirstName string

@@ -57,10 +57,19 @@ func (srv *userAccountServiceExecutor) RegisterKYC(ctx context.Context, kyc requ
 }
 
 func (srv *userAccountServiceExecutor) UserLogin(ctx context.Context, user request.UserAccounRequestModel) response.LoginResponseModel {
+
 	result, err := srv.UserAccountRepo.FetchUserByEmail(ctx, user.Email)
 	if err != nil {
 		panic(exceptions.NotFoundError{
 			Message: err.Error(),
+		})
+	}
+
+	match, matchErr := argon2.ComparePasswordAndHash(user.Password, result.Password, &srv.Argon2Config)
+
+	if match != true {
+		panic(exceptions.BadReqquestError{
+			Message: matchErr.Error(),
 		})
 	}
 
