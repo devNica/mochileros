@@ -25,7 +25,7 @@ func main() {
 	fileRepository := repository.NewFileRepositoryExecutor(conn)
 
 	//services
-	UserAccountService := service.NewUserAccountSrvExecutor(&userAccountRepository, &argon, config)
+	UserAccountService := service.NewUserAccountSrvExecutor(&userAccountRepository, &argon)
 	ResourcesService := service.NewResourcesServiceExecutor(&countryRepository, &fileRepository)
 	HotelService := service.NewHotelServiceExecutor(&hotelRepository, &fileRepository)
 

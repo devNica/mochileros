@@ -24,9 +24,8 @@ type userAccountServiceExecutor struct {
 
 func NewUserAccountSrvExecutor(
 	repo *repositories.UserAccountRepo,
-	argon *configurations.Argon2Config,
-	config configurations.Config) services.UserAccountService {
-	return &userAccountServiceExecutor{UserAccountRepo: *repo, Argon2Config: *argon, Config: config}
+	argon *configurations.Argon2Config) services.UserAccountService {
+	return &userAccountServiceExecutor{UserAccountRepo: *repo, Argon2Config: *argon}
 }
 
 func (srv *userAccountServiceExecutor) UserAccountRegister(ctx context.Context, newUser request.UserAccounRequestModel) {
@@ -81,7 +80,7 @@ func (srv *userAccountServiceExecutor) UserLogin(ctx context.Context, user reque
 		profiles = append(profiles, item)
 	}
 
-	login.Token = commons.GenerateToken(login.Id, profiles, srv.Config)
+	login.Token = commons.GenerateToken(login.Id, profiles)
 
 	return login
 }

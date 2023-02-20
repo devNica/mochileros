@@ -1,18 +1,18 @@
 package commons
 
 import (
+	"os"
 	"strconv"
 	"time"
 
-	"github.com/devNica/mochileros/configurations"
 	"github.com/devNica/mochileros/exceptions"
 	"github.com/golang-jwt/jwt/v4"
 )
 
-func GenerateToken(UserId string, profiles []map[string]interface{}, config configurations.Config) string {
+func GenerateToken(UserId string, profiles []map[string]interface{}) string {
 
-	jwtSecret := config.Get("JWT_SECRET_KEY")
-	jwtExpired, err := strconv.Atoi(config.Get("JWT_EXPIRES_IN"))
+	jwtSecret := os.Getenv("JWT_SECRET_KEY")
+	jwtExpired, err := strconv.Atoi(os.Getenv("JWT_EXPIRES_IN"))
 	exceptions.PanicLogging(err)
 
 	claims := jwt.MapClaims{

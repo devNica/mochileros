@@ -1,15 +1,16 @@
 package middlewares
 
 import (
-	"github.com/devNica/mochileros/configurations"
+	"os"
+
 	"github.com/devNica/mochileros/models"
 	"github.com/gofiber/fiber/v2"
 	jwtware "github.com/gofiber/jwt/v3"
 	"github.com/golang-jwt/jwt/v4"
 )
 
-func AuthenticateJWT(role string, config configurations.Config) func(*fiber.Ctx) error {
-	jwtSecret := config.Get("JWT_SECRET_KEY")
+func AuthenticateJWT(role string) func(*fiber.Ctx) error {
+	jwtSecret := os.Getenv("JWT_SECRET_KEY")
 	return jwtware.New(jwtware.Config{
 		SigningKey: []byte(jwtSecret),
 		SuccessHandler: func(ctx *fiber.Ctx) error {
