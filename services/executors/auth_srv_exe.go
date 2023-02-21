@@ -13,22 +13,20 @@ import (
 	"github.com/devNica/mochileros/exceptions"
 	"github.com/devNica/mochileros/repositories"
 	"github.com/devNica/mochileros/services"
-	"github.com/google/uuid"
 )
 
-type userAccountServiceExecutor struct {
-	repositories.UserAccountRepo
+type authServiceExecutor struct {
+	repositories.UserRepo
 	configurations.Argon2Config
-	configurations.Config
 }
 
-func NewUserAccountSrvExecutor(
-	repo *repositories.UserAccountRepo,
+func NewAuthSrvExecutor(
+	repo *repositories.UserRepo,
 	argon *configurations.Argon2Config) services.AuthService {
-	return &userAccountServiceExecutor{UserAccountRepo: *repo, Argon2Config: *argon}
+	return &authServiceExecutor{UserRepo: *repo, Argon2Config: *argon}
 }
 
-func (srv *userAccountServiceExecutor) CustomerRegister(
+func (srv *authServiceExecutor) CustomerRegister(
 	ctx context.Context,
 	newCustomer request.UserAccounRequestModel) {
 	commons.ValidateModel(newCustomer)
@@ -43,27 +41,13 @@ func (srv *userAccountServiceExecutor) CustomerRegister(
 	profiles := commons.GetProfileDataDictionary()
 	profileId := commons.GetProfileId("CUSTOMERS", profiles)
 
-	err := srv.UserAccountRepo.UserInsert(ctx, account, profileId)
+	err := srv.UserRepo.UserInsert(ctx, account, profileId)
 	exceptions.PanicLogging(err)
 }
 
-func (srv *userAccountServiceExecutor) RegisterKYC(ctx context.Context, kyc request.KYCRequestModel) {
+func (srv *authServiceExecutor) UserLogin(ctx context.Context, user request.UserAccounRequestModel) response.LoginResponseModel {
 
-	userId, err := uuid.Parse(kyc.UserId)
-	exceptions.PanicLogging(err)
-
-	kycEntity := entities.UserInfo{
-		FirstName: kyc.FirstName,
-		LastName:  kyc.LastName,
-		UserId:    userId,
-	}
-
-	srv.UserAccountRepo.InsertKYC(ctx, kycEntity)
-}
-
-func (srv *userAccountServiceExecutor) UserLogin(ctx context.Context, user request.UserAccounRequestModel) response.LoginResponseModel {
-
-	result, err := srv.UserAccountRepo.FetchUserByEmail(ctx, user.Email)
+	result, err := srv.UserRepo.FetchUserByEmail(ctx, user.Email)
 	if err != nil {
 		panic(exceptions.NotFoundError{
 			Message: err.Error(),
@@ -97,10 +81,4 @@ func (srv *userAccountServiceExecutor) UserLogin(ctx context.Context, user reque
 	login.Token = commons.GenerateToken(login.Id, profiles)
 
 	return login
-}
-
-func (srv *userAccountServiceExecutor) ChangeAccountStatus(ctx context.Context, userId string) response.UserResponseModel {
-	response, err := srv.UserAccountRepo.UpdateUserAccountStatus(ctx, userId)
-	exceptions.PanicLogging(err)
-	return response
 }

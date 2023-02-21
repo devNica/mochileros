@@ -10,4 +10,8 @@ type KYCRequestModel struct {
 	UserId    string `json:"userId" validate:"required"`
 	FirstName string `json:"firstName" validate:"required"`
 	LastName  string `json:"lastName" validate:"required"`
+	Address   string `json:"address" validate:"required"`
+	Birthdate string `json:"birthdate" validate:"required"`
+	DNI       string `json:"dni" validate:"required"`
+	CountryId uint16 `json:"country_id" validate:"required"`
 }

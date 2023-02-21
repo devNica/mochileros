@@ -25,12 +25,14 @@ func main() {
 	fileRepository := repository.NewFileRepositoryExecutor(conn)
 
 	//services
-	UserAccountService := service.NewUserAccountSrvExecutor(&userAccountRepository, &argon)
+	UserAccountService := service.NewUserSrvExecutor(&userAccountRepository)
+	AuthService := service.NewAuthSrvExecutor(&userAccountRepository, &argon)
 	ResourcesService := service.NewResourcesServiceExecutor(&countryRepository, &fileRepository)
 	HotelService := service.NewHotelServiceExecutor(&hotelRepository, &fileRepository)
 
 	//controllers
-	authController := controllers.NewAuthController(&UserAccountService, config)
+	authController := controllers.NewAuthController(&AuthService, config)
+	userController := controllers.NewUserController(&UserAccountService, config)
 	propsController := controllers.NewPropsController(&ResourcesService, config)
 	hotelController := controllers.NewOwnerController(&HotelService, config)
 
@@ -45,6 +47,7 @@ func main() {
 
 	// routing
 	authController.Route(app)
+	userController.Route(app)
 	propsController.Route(app)
 	hotelController.Route(app)
 

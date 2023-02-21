@@ -14,15 +14,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type userAccountExecutor struct {
+type userRepoExecutor struct {
 	*gorm.DB
 }
 
-func NewUserAccountExecutor(DB *gorm.DB) repositories.UserAccountRepo {
-	return &userAccountExecutor{DB: DB}
+func NewUserRepoExecutor(DB *gorm.DB) repositories.UserRepo {
+	return &userRepoExecutor{DB: DB}
 }
 
-func (repo *userAccountExecutor) UserInsert(
+func (repo *userRepoExecutor) UserInsert(
 	ctx context.Context,
 	userAccount entities.UserAccount,
 	profileId uint16) error {
@@ -53,13 +53,13 @@ func (repo *userAccountExecutor) UserInsert(
 	return nil
 }
 
-func (repo *userAccountExecutor) InsertKYC(ctx context.Context, kyc entities.UserInfo) error {
+func (repo *userRepoExecutor) InsertKYC(ctx context.Context, kyc entities.UserInfo) error {
 	err := repo.DB.WithContext(ctx).Create(&kyc).Error
 	exceptions.PanicLogging(err)
 	return nil
 }
 
-func (repo *userAccountExecutor) FetchUserByEmail(ctx context.Context, email string) (response.UserInfoResponseModel, error) {
+func (repo *userRepoExecutor) FetchUserByEmail(ctx context.Context, email string) (response.UserInfoResponseModel, error) {
 
 	type queryModel struct {
 		UserId    string
@@ -115,7 +115,7 @@ func (repo *userAccountExecutor) FetchUserByEmail(ctx context.Context, email str
 
 }
 
-func (repo *userAccountExecutor) UpdateUserAccountStatus(ctx context.Context, userId string) (response.UserResponseModel, error) {
+func (repo *userRepoExecutor) UpdateUserAccountStatus(ctx context.Context, userId string) (response.UserResponseModel, error) {
 
 	var foundUser entities.UserAccount
 
