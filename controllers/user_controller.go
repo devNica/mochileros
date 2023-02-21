@@ -1,6 +1,9 @@
 package controllers
 
 import (
+	"errors"
+
+	"github.com/devNica/mochileros/commons/serializers"
 	"github.com/devNica/mochileros/configurations"
 	"github.com/devNica/mochileros/dto/request"
 	"github.com/devNica/mochileros/exceptions"
@@ -25,12 +28,29 @@ func (controller userController) Route(app *fiber.App) {
 
 func (controller userController) RegisterKYC(c *fiber.Ctx) error {
 
-	var request request.KYCRequestModel
-	request.UserId = c.Params("userID")
-	err := c.BodyParser(&request)
+	var kycRequest request.KYCRequestModel
+	kycRequest.UserId = c.Params("userID")
+	err := c.BodyParser(&kycRequest)
 	exceptions.PanicLogging(err)
 
-	controller.UserService.RegisterKYC(c.Context(), request)
+	form, multipartError := c.MultipartForm()
+
+	if multipartError != nil {
+		exceptions.PanicLogging(multipartError)
+	}
+
+	files := form.File
+
+	if len(files) == 0 {
+		exceptions.PanicLogging(errors.New("Images not found"))
+	}
+
+	images, serializeError := serializers.SerializeUserAsset(files)
+	if serializeError != nil {
+		exceptions.PanicLogging(serializeError)
+	}
+
+	controller.UserService.RegisterKYC(c.Context(), kycRequest, images)
 
 	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
 		Code:    201,

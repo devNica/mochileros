@@ -8,6 +8,6 @@ import (
 )
 
 type UserService interface {
-	RegisterKYC(ctx context.Context, kyc request.KYCRequestModel)
+	RegisterKYC(ctx context.Context, kyc request.KYCRequestModel, newFiles []request.FileRequestModel)
 	ChangeAccountStatus(ctx context.Context, userId string) response.UserResponseModel
 }
