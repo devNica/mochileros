@@ -18,4 +18,5 @@ type Country struct {
 	CurrName    string       `gorm:"column:currname;type:varchar(50);not null"`
 	CurrSymbol  string       `gorm:"column:currsymbol;type:varchar(10);not null"`
 	HotelInfo   []Hotel      `gorm:"foreignKey:country_id"`
+	KYCInfo     UserInfo     `gorm:"foreingkey:country_id"`
 }

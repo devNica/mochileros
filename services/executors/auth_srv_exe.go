@@ -24,21 +24,26 @@ type userAccountServiceExecutor struct {
 
 func NewUserAccountSrvExecutor(
 	repo *repositories.UserAccountRepo,
-	argon *configurations.Argon2Config) services.UserAccountService {
+	argon *configurations.Argon2Config) services.AuthService {
 	return &userAccountServiceExecutor{UserAccountRepo: *repo, Argon2Config: *argon}
 }
 
-func (srv *userAccountServiceExecutor) UserAccountRegister(ctx context.Context, newUser request.UserAccounRequestModel) {
-	commons.ValidateModel(newUser)
-	hash := argon2.GeneratePassworHash(newUser.Password, &srv.Argon2Config)
+func (srv *userAccountServiceExecutor) CustomerRegister(
+	ctx context.Context,
+	newCustomer request.UserAccounRequestModel) {
+	commons.ValidateModel(newCustomer)
+	hash := argon2.GeneratePassworHash(newCustomer.Password, &srv.Argon2Config)
 	account := entities.UserAccount{
-		Email:     newUser.Email,
+		Email:     newCustomer.Email,
 		Password:  hash,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
 
-	err := srv.UserAccountRepo.UserInsert(ctx, account)
+	profiles := commons.GetProfileDataDictionary()
+	profileId := commons.GetProfileId("CUSTOMERS", profiles)
+
+	err := srv.UserAccountRepo.UserInsert(ctx, account, profileId)
 	exceptions.PanicLogging(err)
 }
 

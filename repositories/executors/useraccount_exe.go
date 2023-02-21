@@ -22,7 +22,10 @@ func NewUserAccountExecutor(DB *gorm.DB) repositories.UserAccountRepo {
 	return &userAccountExecutor{DB: DB}
 }
 
-func (repo *userAccountExecutor) UserInsert(ctx context.Context, userAccount entities.UserAccount) error {
+func (repo *userAccountExecutor) UserInsert(
+	ctx context.Context,
+	userAccount entities.UserAccount,
+	profileId uint16) error {
 	userAccount.Id = uuid.New()
 	err := repo.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(&userAccount).Error; err != nil {
@@ -32,7 +35,7 @@ func (repo *userAccountExecutor) UserInsert(ctx context.Context, userAccount ent
 
 		profile := entities.UserProfiles{
 			UserId:    userAccount.Id,
-			ProfileId: 2,
+			ProfileId: profileId,
 		}
 
 		if err := tx.Create(&profile).Error; err != nil {
@@ -51,7 +54,6 @@ func (repo *userAccountExecutor) UserInsert(ctx context.Context, userAccount ent
 }
 
 func (repo *userAccountExecutor) InsertKYC(ctx context.Context, kyc entities.UserInfo) error {
-	kyc.Id = uuid.New()
 	err := repo.DB.WithContext(ctx).Create(&kyc).Error
 	exceptions.PanicLogging(err)
 	return nil

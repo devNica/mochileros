@@ -30,7 +30,7 @@ func main() {
 	HotelService := service.NewHotelServiceExecutor(&hotelRepository, &fileRepository)
 
 	//controllers
-	userAccountController := controllers.NewUserAccountController(&UserAccountService, config)
+	authController := controllers.NewAuthController(&UserAccountService, config)
 	propsController := controllers.NewPropsController(&ResourcesService, config)
 	hotelController := controllers.NewOwnerController(&HotelService, config)
 
@@ -44,7 +44,7 @@ func main() {
 	})
 
 	// routing
-	userAccountController.Route(app)
+	authController.Route(app)
 	propsController.Route(app)
 	hotelController.Route(app)
 
