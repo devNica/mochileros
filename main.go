@@ -19,14 +19,14 @@ func main() {
 	argon := configurations.NewArgonConfg()
 
 	// repositories
-	userAccountRepository := repository.NewUserAccountExecutor(conn)
+	userRepository := repository.NewUserRepoExecutor(conn)
 	countryRepository := repository.NewCountryRepoExecutor(conn)
 	hotelRepository := repository.NewHotelRepoExecutor(conn)
 	fileRepository := repository.NewFileRepositoryExecutor(conn)
 
 	//services
-	UserAccountService := service.NewUserSrvExecutor(&userAccountRepository)
-	AuthService := service.NewAuthSrvExecutor(&userAccountRepository, &argon)
+	UserAccountService := service.NewUserSrvExecutor(&userRepository)
+	AuthService := service.NewAuthSrvExecutor(&userRepository, &argon)
 	ResourcesService := service.NewResourcesServiceExecutor(&countryRepository, &fileRepository)
 	HotelService := service.NewHotelServiceExecutor(&hotelRepository, &fileRepository)
 
