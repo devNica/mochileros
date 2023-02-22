@@ -18,6 +18,7 @@ type UserAccount struct {
 	OwnerHotel     []Hotel        `gorm:"foreignKey:owner_id"`
 	UserHasProfile []UserProfiles `gorm:"foreignKey:user_id"`
 	UserHasAsset   []UserAssets   `gorm:"foreignKey:user_id"`
+	StatusId       uint8          `gorm:"column:status_id;primaryKey"`
 }
 
 type UserInfo struct {
@@ -29,4 +30,10 @@ type UserInfo struct {
 	DNI       string    `gorm:"column:dni;type:varchar(100);not null;unique"`
 	CountryID uint16    `gorm:"column:country_id;primaryKey"`
 	UserId    uuid.UUID `gorm:"column:user_id;primaryKey"`
+}
+
+type AccountStatus struct {
+	Id         uint8         `gorm:"primaryKey;column:id;autoIncrement;not null;unique"`
+	Status     string        `gorm:"column:status;type:varchar(100);not null"`
+	UserStatus []UserAccount `gorm:"foreignKey:status_id"`
 }
