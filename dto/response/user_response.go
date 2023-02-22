@@ -7,18 +7,19 @@ import (
 )
 
 type UserResponseModel struct {
-	Id        uuid.UUID
-	Email     string
-	IsActive  bool
-	CreatedAt time.Time
+	Id            uuid.UUID
+	Email         string
+	TwoFactorAuth bool
+	Status        string
+	CreatedAt     time.Time
 }
 
 type UserInfoResponseModel struct {
-	Id       string
-	Email    string
-	Password string
-	IsActive bool
-	UserInfo struct {
+	Id            string
+	Email         string
+	Password      string
+	TwoFactorAuth bool
+	UserInfo      struct {
 		FirstName string
 		LastName  string
 	}
@@ -27,10 +28,10 @@ type UserInfoResponseModel struct {
 }
 
 type LoginResponseModel struct {
-	Id       string
-	Email    string
-	IsActive bool
-	UserInfo struct {
+	Id            string
+	Email         string
+	TwoFactorAuth bool
+	UserInfo      struct {
 		FirstName string
 		LastName  string
 	}

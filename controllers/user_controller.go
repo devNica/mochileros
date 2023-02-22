@@ -23,7 +23,6 @@ func NewUserController(service *services.UserService, config configurations.Conf
 
 func (controller userController) Route(app *fiber.App) {
 	app.Post("/mochileros/v1/user/:userId/kyc", controller.RegisterKYC)
-	app.Put("/mochileros/v1/user/:userId/status", controller.ChangeAccountStatus)
 }
 
 func (controller userController) RegisterKYC(c *fiber.Ctx) error {
@@ -56,17 +55,5 @@ func (controller userController) RegisterKYC(c *fiber.Ctx) error {
 		Code:    201,
 		Message: "KYC registered successfully",
 		Data:    "",
-	})
-}
-
-func (controller userController) ChangeAccountStatus(c *fiber.Ctx) error {
-	userId := c.Params("userID")
-
-	response := controller.UserService.ChangeAccountStatus(c.Context(), userId)
-
-	return c.Status(fiber.StatusCreated).JSON(models.GeneralResponseModel{
-		Code:    200,
-		Message: "Success",
-		Data:    response,
 	})
 }

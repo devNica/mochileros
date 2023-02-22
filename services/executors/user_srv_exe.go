@@ -6,7 +6,6 @@ import (
 
 	"github.com/devNica/mochileros/commons"
 	"github.com/devNica/mochileros/dto/request"
-	"github.com/devNica/mochileros/dto/response"
 	"github.com/devNica/mochileros/entities"
 	"github.com/devNica/mochileros/exceptions"
 	"github.com/devNica/mochileros/repositories"
@@ -28,8 +27,8 @@ func (srv *userServiceExecutor) RegisterKYC(
 	kyc request.KYCRequestModel,
 	newFiles []request.FileRequestModel) {
 
-	userId, err := uuid.Parse(kyc.UserId)
-	exceptions.PanicLogging(err)
+	userId, parserError := uuid.Parse(kyc.UserId)
+	exceptions.PanicLogging(parserError)
 
 	kycEntity := entities.UserInfo{
 		FirstName: kyc.FirstName,
@@ -42,6 +41,11 @@ func (srv *userServiceExecutor) RegisterKYC(
 	}
 
 	commons.ValidateModel(kycEntity)
+
+	checkAccError := srv.CheckAccountExistByUserId(kyc.UserId)
+	if checkAccError != nil {
+		exceptions.PanicLogging(checkAccError)
+	}
 
 	registerError := srv.UserRepo.InsertKYC(ctx, kycEntity)
 
@@ -67,10 +71,38 @@ func (srv *userServiceExecutor) RegisterKYC(
 		)
 	}
 
+	reqVerification := request.AccVerificationRequestModel{
+		StatusId:      2,
+		TwoFactorAuth: true,
+	}
+
+	// update account verification status
+	updateError := srv.UserRepo.UpdateAccountVerification(userId, reqVerification, true)
+	if updateError != nil {
+		exceptions.PanicLogging(updateError)
+	}
+
 }
 
-func (srv *userServiceExecutor) ChangeAccountStatus(ctx context.Context, userId string) response.UserResponseModel {
-	response, err := srv.UserRepo.UpdateUserAccountStatus(ctx, userId)
+func (srv *userServiceExecutor) ChangeAccountStatus(ctx context.Context, userId string, statusId uint8) {
+
+	id, parseError := uuid.Parse(userId)
+
+	if parseError != nil {
+		exceptions.PanicLogging(parseError)
+	}
+
+	checkAccError := srv.CheckAccountExistByUserId(userId)
+
+	if checkAccError != nil {
+		exceptions.PanicLogging(checkAccError)
+	}
+
+	reqVerification := request.AccVerificationRequestModel{
+		StatusId: 3,
+	}
+
+	err := srv.UserRepo.UpdateAccountVerification(id, reqVerification, false)
 	exceptions.PanicLogging(err)
-	return response
+
 }

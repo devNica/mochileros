@@ -3,7 +3,6 @@ package configurations
 import (
 	"fmt"
 
-	"github.com/devNica/mochileros/entities"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -42,18 +41,18 @@ func DatabaseConnect(config Config) *gorm.DB {
 	}
 
 	//AutoMigrate
-	err = db.AutoMigrate(&entities.Country{})
-	err = db.AutoMigrate(&entities.Profile{})
-	err = db.AutoMigrate(&entities.AssetType{})
-	err = db.AutoMigrate(&entities.File{})
-	err = db.AutoMigrate(&entities.AccountStatus{})
-	err = db.AutoMigrate(&entities.UserAccount{})
-	err = db.AutoMigrate(&entities.UserInfo{})
-	err = db.AutoMigrate(&entities.UserAssets{})
-	err = db.AutoMigrate(&entities.UserProfiles{})
-	err = db.AutoMigrate(&entities.HotelStatus{})
-	err = db.AutoMigrate(&entities.Hotel{})
-	err = db.AutoMigrate(&entities.HotelAssets{})
+	// err = db.AutoMigrate(&entities.Country{})
+	// err = db.AutoMigrate(&entities.Profile{})
+	// err = db.AutoMigrate(&entities.AssetType{})
+	// err = db.AutoMigrate(&entities.File{})
+	// err = db.AutoMigrate(&entities.AccountStatus{})
+	// err = db.AutoMigrate(&entities.UserAccount{})
+	// err = db.AutoMigrate(&entities.UserInfo{})
+	// err = db.AutoMigrate(&entities.UserAssets{})
+	// err = db.AutoMigrate(&entities.UserProfiles{})
+	// err = db.AutoMigrate(&entities.HotelStatus{})
+	// err = db.AutoMigrate(&entities.Hotel{})
+	// err = db.AutoMigrate(&entities.HotelAssets{})
 
 	return db
 

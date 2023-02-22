@@ -3,13 +3,16 @@ package repositories
 import (
 	"context"
 
+	"github.com/devNica/mochileros/dto/request"
 	"github.com/devNica/mochileros/dto/response"
 	"github.com/devNica/mochileros/entities"
+	"github.com/google/uuid"
 )
 
 type UserRepo interface {
-	UserInsert(ctx context.Context, newUser entities.UserAccount, profileId uint16) error
-	FetchUserByEmail(ctx context.Context, email string) (response.UserInfoResponseModel, error)
+	UserInsert(newUser entities.UserAccount, profileId uint16) error
+	FetchUserByEmail(email string) (response.UserInfoResponseModel, error)
 	InsertKYC(ctx context.Context, kyc entities.UserInfo) error
-	UpdateUserAccountStatus(ctx context.Context, userId string) (response.UserResponseModel, error)
+	CheckAccountExistByUserId(userId string) error
+	UpdateAccountVerification(userId uuid.UUID, req request.AccVerificationRequestModel, isFull bool) error
 }

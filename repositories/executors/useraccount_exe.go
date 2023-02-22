@@ -3,9 +3,12 @@ package executors
 import (
 	"context"
 	"errors"
+	"fmt"
+	"reflect"
 	"strings"
 	"time"
 
+	"github.com/devNica/mochileros/dto/request"
 	"github.com/devNica/mochileros/dto/response"
 	"github.com/devNica/mochileros/entities"
 	"github.com/devNica/mochileros/exceptions"
@@ -22,10 +25,8 @@ func NewUserRepoExecutor(DB *gorm.DB) repositories.UserRepo {
 	return &userRepoExecutor{DB: DB}
 }
 
-func (repo *userRepoExecutor) UserInsert(
-	ctx context.Context,
-	userAccount entities.UserAccount,
-	profileId uint16) error {
+func (repo *userRepoExecutor) UserInsert(userAccount entities.UserAccount, profileId uint16) error {
+
 	userAccount.Id = uuid.New()
 	err := repo.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(&userAccount).Error; err != nil {
@@ -59,17 +60,17 @@ func (repo *userRepoExecutor) InsertKYC(ctx context.Context, kyc entities.UserIn
 	return nil
 }
 
-func (repo *userRepoExecutor) FetchUserByEmail(ctx context.Context, email string) (response.UserInfoResponseModel, error) {
+func (repo *userRepoExecutor) FetchUserByEmail(email string) (response.UserInfoResponseModel, error) {
 
 	type queryModel struct {
-		UserId    string
-		Email     string
-		Password  string
-		FirstName string
-		LastName  string
-		IsActive  bool
-		Profile   string
-		CreatedAt time.Time
+		UserId        string
+		Email         string
+		Password      string
+		FirstName     string
+		LastName      string
+		TwoFactorAuth bool
+		Profile       string
+		CreatedAt     time.Time
 	}
 
 	var model queryModel
@@ -81,7 +82,7 @@ func (repo *userRepoExecutor) FetchUserByEmail(ctx context.Context, email string
 			user_account.password, 
 			user_info.first_name, 
 			user_info.last_name, 
-			user_account.is_active,
+			user_account.two_factor_auht,
 			string_agg(distinct profile.profile, ',') as profile,
 			user_account.created_at
 		`).
@@ -96,10 +97,10 @@ func (repo *userRepoExecutor) FetchUserByEmail(ctx context.Context, email string
 	}
 
 	Account := response.UserInfoResponseModel{
-		Id:       model.UserId,
-		Email:    model.Email,
-		Password: model.Password,
-		IsActive: model.IsActive,
+		Id:            model.UserId,
+		Email:         model.Email,
+		Password:      model.Password,
+		TwoFactorAuth: model.TwoFactorAuth,
 		UserInfo: struct {
 			FirstName string
 			LastName  string
@@ -115,28 +116,52 @@ func (repo *userRepoExecutor) FetchUserByEmail(ctx context.Context, email string
 
 }
 
-func (repo *userRepoExecutor) UpdateUserAccountStatus(ctx context.Context, userId string) (response.UserResponseModel, error) {
+func (repo *userRepoExecutor) CheckAccountExistByUserId(userId string) error {
 
-	var foundUser entities.UserAccount
+	var user = &entities.UserAccount{}
 
-	q1 := repo.DB.WithContext(ctx).Where("id = ?", userId).First(&foundUser)
+	repo.DB.First(&user, "id = ?", userId)
 
-	if q1.RowsAffected == 0 {
-		return response.UserResponseModel{}, errors.New("User account not found")
+	if reflect.DeepEqual(user, entities.UserAccount{}) {
+		return errors.New("user account not found")
+	} else {
+		return nil
+	}
+}
+
+func (repo *userRepoExecutor) UpdateAccountVerification(userId uuid.UUID, request request.AccVerificationRequestModel, isFull bool) error {
+
+	userAccount := entities.UserAccount{Id: userId}
+
+	if isFull {
+
+		q2 := repo.DB.Model(userAccount).Select("status_id", "two_factor_auth").Updates(entities.UserAccount{
+			StatusId:      request.StatusId,
+			TwoFactorAuth: request.TwoFactorAuth,
+		})
+
+		if err := repo.DB.Error; err != nil {
+			fmt.Println("ocurri un error")
+			exceptions.PanicLogging(err)
+		}
+
+		if q2.RowsAffected == 0 {
+			return errors.New("failed to update account")
+		}
+
+		return nil
+
+	} else {
+
+		q2 := repo.DB.Model(userAccount).Select("status_id").Updates(entities.UserAccount{
+			StatusId: request.StatusId,
+		})
+
+		if q2.RowsAffected == 0 {
+			return errors.New("failed to update account")
+		}
+
+		return nil
 	}
 
-	q2 := repo.DB.Model(foundUser).Where("id = ?", userId).Update("is_active", !foundUser.IsActive)
-
-	if q2.RowsAffected == 0 {
-		return response.UserResponseModel{}, errors.New("failed to update account")
-	}
-
-	User := response.UserResponseModel{
-		Id:        foundUser.Id,
-		Email:     foundUser.Email,
-		IsActive:  foundUser.IsActive,
-		CreatedAt: foundUser.CreatedAt,
-	}
-
-	return User, nil
 }

@@ -15,3 +15,8 @@ type KYCRequestModel struct {
 	DNI       string `json:"dni" validate:"required"`
 	CountryId uint16 `json:"country_id" validate:"required"`
 }
+
+type AccVerificationRequestModel struct {
+	StatusId      uint8
+	TwoFactorAuth bool
+}

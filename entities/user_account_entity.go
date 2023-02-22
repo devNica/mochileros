@@ -7,11 +7,12 @@ import (
 )
 
 type UserAccount struct {
-	Id             uuid.UUID      `gorm:"primaryKey;column:id;type:varchar(36)"`
+	Id             uuid.UUID      `gorm:"primaryKey;column:id;type:varchar(36);unique"`
 	Email          string         `gorm:"column:email;type:varchar(200);not null;unique"`
 	Password       string         `gorm:"column:password;type:varchar(255);not null"`
 	PhoneNumber    string         `gorm:"column:phone_number;type:varchar(20);not null;unique"`
-	IsActive       bool           `gorm:"column:is_active;type:bool;not null;default:true"`
+	IsRoot         bool           `gorm:"column:is_root;type:bool;not null;default:false"`
+	TwoFactorAuth  bool           `gorm:"column:two_factor_auth;type:bool;not null;default:false"`
 	CreatedAt      time.Time      `gorm:"column:created_at"`
 	UpdatedAt      time.Time      `gorm:"column:updated_at"`
 	UserKYC        UserInfo       `gorm:"foreignKey:user_id"`
@@ -33,7 +34,7 @@ type UserInfo struct {
 }
 
 type AccountStatus struct {
-	Id         uint8         `gorm:"primaryKey;column:id;autoIncrement;not null;unique"`
-	Status     string        `gorm:"column:status;type:varchar(100);not null"`
-	UserStatus []UserAccount `gorm:"foreignKey:status_id"`
+	Id        uint8         `gorm:"primaryKey;column:id;autoIncrement;not null;unique"`
+	Status    string        `gorm:"column:status;type:varchar(100);not null"`
+	AccStatus []UserAccount `gorm:"foreignKey:status_id"`
 }
