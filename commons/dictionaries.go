@@ -3,9 +3,10 @@ package commons
 var dict = make(map[string]interface{})
 
 var profiles = map[string]uint16{
-	"OWNERS":    1,
-	"CUSTOMERS": 2,
-	"ADMINS":    3,
+	"owners":    1,
+	"customers": 2,
+	"admins":    3,
+	"operators": 4,
 }
 var assetsType = map[string]uint16{
 	"frontalPictureProfile": 1,
@@ -19,6 +20,14 @@ var accountStatus = map[string]uint8{
 	"approved":             3,
 	"rejected":             4,
 	"locked":               5,
+}
+
+var reviewStatus = map[string]uint8{
+	"pending assignment": 1,
+	"under review":       2,
+	"confirming changes": 3,
+	"review finished":    4,
+	"reassigned review":  5,
 }
 
 func GetProfileDataDictionary() interface{} {

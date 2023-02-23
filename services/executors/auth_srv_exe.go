@@ -49,7 +49,7 @@ func (srv *authServiceExecutor) CustomerRegister(
 	}
 
 	profiles := commons.GetProfileDataDictionary()
-	profileId := commons.GetProfileId("CUSTOMERS", profiles)
+	profileId := commons.GetProfileId("customers", profiles)
 
 	err := srv.UserRepo.UserInsert(account, profileId)
 	exceptions.PanicLogging(err)
