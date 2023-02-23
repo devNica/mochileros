@@ -82,14 +82,21 @@ func (repo *userRepoExecutor) FetchUserByEmail(email string) (response.UserInfoR
 			user_account.password, 
 			user_info.first_name, 
 			user_info.last_name, 
-			user_account.two_factor_auht,
+			user_account.two_factor_auth,
 			string_agg(distinct profile.profile, ',') as profile,
 			user_account.created_at
 		`).
 		Joins("inner join user_info on user_info.user_id = user_account.id").
 		Joins("inner join user_profiles on user_profiles.user_id = user_account.id").
 		Joins("inner join profile on profile.id = user_profiles.profile_id").
-		Where("user_account.email = ?", email).Group("user_account.id, user_info.first_name, user_info.last_name").
+		Where("user_account.email = ?", email).Group(`
+			user_account.id, 
+			user_account.email,
+			user_account.password,
+			user_account.two_factor_auth,
+			user_account.created_at, 
+			user_info.first_name, 
+			user_info.last_name`).
 		Scan(&model)
 
 	if result.RowsAffected == 0 {
@@ -116,16 +123,16 @@ func (repo *userRepoExecutor) FetchUserByEmail(email string) (response.UserInfoR
 
 }
 
-func (repo *userRepoExecutor) CheckAccountExistByUserId(userId string) error {
+func (repo *userRepoExecutor) CheckAccountExistByUserId(userId string) (entities.UserAccount, error) {
 
 	var user = &entities.UserAccount{}
 
 	repo.DB.First(&user, "id = ?", userId)
 
 	if reflect.DeepEqual(user, entities.UserAccount{}) {
-		return errors.New("user account not found")
+		return entities.UserAccount{}, errors.New("user account not found")
 	} else {
-		return nil
+		return *user, nil
 	}
 }
 

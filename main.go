@@ -23,12 +23,13 @@ func main() {
 	countryRepository := repository.NewCountryRepoExecutor(conn)
 	hotelRepository := repository.NewHotelRepoExecutor(conn)
 	fileRepository := repository.NewFileRepositoryExecutor(conn)
+	backofficeRepository := repository.NewBackofficeExecutor(conn)
 
 	//services
-	UserAccountService := service.NewUserSrvExecutor(&userRepository, &fileRepository)
+	UserAccountService := service.NewUserSrvExecutor(&userRepository, &fileRepository, &backofficeRepository)
 	AuthService := service.NewAuthSrvExecutor(&userRepository, &argon)
 	ResourcesService := service.NewResourcesServiceExecutor(&countryRepository, &fileRepository)
-	HotelService := service.NewHotelServiceExecutor(&hotelRepository, &fileRepository)
+	HotelService := service.NewHotelServiceExecutor(&hotelRepository, &fileRepository, &userRepository)
 
 	//controllers
 	authController := controllers.NewAuthController(&AuthService, config)

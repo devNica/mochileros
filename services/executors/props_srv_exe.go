@@ -71,27 +71,6 @@ func (repo *propsServiceExecutor) GetAll(ctx context.Context) []response.Country
 	countries, err := repo.CountryRepo.FetchAll(ctx)
 	exceptions.PanicLogging(err)
 
-	// var countries []models.Country
-	// for _, country := range res {
-
-	// 	countries = append(countries, models.Country{
-	// 		Id:          country.Id,
-	// 		Name:        country.Name,
-	// 		Capital:     country.Name,
-	// 		Cca3:        country.Cca3,
-	// 		CallingCode: country.CallingCode,
-	// 		TimeZones:   country.TimeZones,
-	// 		States:      country.States,
-	// 		Latitude:    country.Latitude,
-	// 		Longitude:   country.Longitude,
-	// 		FlagPng:     country.FlagPng,
-	// 		FlagSvg:     country.FlagSvg,
-	// 		CurrCode:    country.CurrCode,
-	// 		CurrName:    country.CurrName,
-	// 		CurrSymbol:  country.CurrSymbol,
-	// 	})
-	// }
-
 	return countries
 
 }

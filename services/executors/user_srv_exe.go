@@ -16,10 +16,18 @@ import (
 type userServiceExecutor struct {
 	repositories.UserRepo
 	repositories.FileRepo
+	repositories.BackofficeRepo
 }
 
-func NewUserSrvExecutor(userRepo *repositories.UserRepo, fileRepo *repositories.FileRepo) services.UserService {
-	return &userServiceExecutor{UserRepo: *userRepo, FileRepo: *fileRepo}
+func NewUserSrvExecutor(
+	userRepo *repositories.UserRepo,
+	fileRepo *repositories.FileRepo,
+	backofficeRepo *repositories.BackofficeRepo) services.UserService {
+	return &userServiceExecutor{
+		UserRepo:       *userRepo,
+		FileRepo:       *fileRepo,
+		BackofficeRepo: *backofficeRepo,
+	}
 }
 
 func (srv *userServiceExecutor) RegisterKYC(
@@ -42,7 +50,7 @@ func (srv *userServiceExecutor) RegisterKYC(
 
 	commons.ValidateModel(kycEntity)
 
-	checkAccError := srv.CheckAccountExistByUserId(kyc.UserId)
+	_, checkAccError := srv.CheckAccountExistByUserId(kyc.UserId)
 	if checkAccError != nil {
 		exceptions.PanicLogging(checkAccError)
 	}
@@ -82,6 +90,19 @@ func (srv *userServiceExecutor) RegisterKYC(
 		exceptions.PanicLogging(updateError)
 	}
 
+	kycReview := entities.KYCReviewRequest{
+		Id:             uuid.New(),
+		UserRef:        kyc.UserId,
+		PreRevStatus:   "awaitingReview",
+		CreatedAt:      time.Now(),
+		ReviewStatusId: 1,
+	}
+
+	reviewReqError := srv.BackofficeRepo.InsertKYCReviewRequest(kycReview)
+	if reviewReqError != nil {
+		exceptions.PanicLogging(reviewReqError)
+	}
+
 }
 
 func (srv *userServiceExecutor) ChangeAccountStatus(ctx context.Context, userId string, statusId uint8) {
@@ -92,7 +113,7 @@ func (srv *userServiceExecutor) ChangeAccountStatus(ctx context.Context, userId 
 		exceptions.PanicLogging(parseError)
 	}
 
-	checkAccError := srv.CheckAccountExistByUserId(userId)
+	_, checkAccError := srv.CheckAccountExistByUserId(userId)
 
 	if checkAccError != nil {
 		exceptions.PanicLogging(checkAccError)

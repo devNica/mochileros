@@ -19,6 +19,7 @@ import (
 type hotelServiceExecutor struct {
 	repositories.HotelRepo
 	repositories.FileRepo
+	repositories.UserRepo
 }
 
 // type FileModel struct {
@@ -30,11 +31,31 @@ type hotelServiceExecutor struct {
 // 	return fmt.Sprintf("%+v", f)
 // }
 
-func NewHotelServiceExecutor(hotelRepo *repositories.HotelRepo, fileRepo *repositories.FileRepo) services.HotelService {
-	return &hotelServiceExecutor{HotelRepo: *hotelRepo, FileRepo: *fileRepo}
+func NewHotelServiceExecutor(
+	hotelRepo *repositories.HotelRepo,
+	fileRepo *repositories.FileRepo,
+	userRepo *repositories.UserRepo) services.HotelService {
+	return &hotelServiceExecutor{
+		HotelRepo: *hotelRepo,
+		FileRepo:  *fileRepo,
+		UserRepo:  *userRepo,
+	}
 }
 
 func (repo *hotelServiceExecutor) RegisterHotel(ctx context.Context, newHotel request.HotelRequestModel, newFile request.FileRequestModel) {
+
+	user, checkError := repo.UserRepo.CheckAccountExistByUserId(newHotel.OwnerId)
+
+	if checkError != nil {
+		exceptions.PanicLogging(checkError)
+	}
+
+	if user.StatusId != 3 {
+		exceptions.PanicLogging(exceptions.BadReqquestError{
+			Message: "the kyc of the account is not approved",
+		})
+	}
+
 	commons.ValidateModel(newHotel)
 
 	ownerId, errParse := uuid.Parse(newHotel.OwnerId)
